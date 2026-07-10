@@ -1,0 +1,8 @@
+-- Seed sponsors data
+INSERT INTO sponsors (id, name, logo, website, tier, description, is_active, display_order) VALUES
+('33333333-3333-3333-3333-333333333301', 'Nepal Tourism Board', 'https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=200', 'https://www.welcomenepal.com', 'platinum', 'Supporting sustainable tourism development in Nepal.', true, 1),
+('33333333-3333-3333-3333-333333333302', 'The North Face', 'https://images.pexels.com/photos/422218/pexels-photo-422218.jpeg?auto=compress&cs=tinysrgb&w=200', 'https://www.thenorthface.com', 'gold', 'Premium outdoor gear for adventurers worldwide.', true, 2),
+('33333333-3333-3333-3333-333333333303', 'World Wildlife Fund', 'https://images.pexels.com/photos/247502/pexels-photo-247502.jpeg?auto=compress&cs=tinysrgb&w=200', 'https://www.worldwildlife.org', 'gold', 'Conservation partner protecting Nepal''s biodiversity.', true, 3),
+('33333333-3333-3333-3333-333333333304', 'Local Trekking Agency', 'https://images.pexels.com/photos/2387878/pexels-photo-2387878.jpeg?auto=compress&cs=tinysrgb&w=200', NULL, 'silver', 'Expert local guides with decades of experience.', true, 4),
+('33333333-3333-3333-3333-333333333305', 'Himalayan Health Care', 'https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=200', NULL, 'silver', 'Medical support for remote mountain communities.', true, 5),
+('33333333-3333-3333-3333-333333333306', 'Sustainable Trails', 'https://images.pexels.com/photos/1421909/pexels-photo-1421909.jpeg?auto=compress&cs=tinysrgb&w=200', NULL, 'bronze', 'Eco-friendly trekking initiatives.', true, 6);

@@ -1,0 +1,88 @@
+import { GalleryImage } from '../types';
+
+export const galleryData: GalleryImage[] = [
+  {
+    id: '1',
+    src: '/screenshots/nike.png',
+    alt: 'Everest Base Camp trekker with Himalayan backdrop',
+    category: 'hikes',
+    location: 'Everest Base Camp',
+  },
+  {
+    id: '2',
+    src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREvvTxhLBnGfOVyYSWhtBX_K2uvwKbjHNKyA&s',
+    alt: 'Annapurna mountain range at sunrise',
+    category: 'nature',
+    location: 'Annapurna',
+  },
+  {
+    id: '3',
+    src: 'https://images.pexels.com/photos/3228096/pexels-photo-3228096.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    alt: 'Traditional village in Langtang region',
+    category: 'community',
+    location: 'Langtang',
+  },
+  {
+    id: '4',
+    src: 'https://images.squarespace-cdn.com/content/v1/5a87961cbe42d637c54cab93/1609405879022-E23KK2NRPVKMSFV1C3XR/crossing-thorong-la-pass-annapurna-circuit.jpg?format=500w',
+    alt: 'Prayer flags on mountain pass',
+    category: 'nature',
+    location: 'Thorong La',
+  },
+  {
+    id: '5',
+    src: 'https://images.pexels.com/photos/3025159/pexels-photo-3025159.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    alt: 'Sunrise over Kathmandu valley',
+    category: 'nature',
+    location: 'Nagarkot',
+  },
+  {
+    id: '6',
+    src: 'https://images.pexels.com/photos/1291962/pexels-photo-1291962.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    alt: 'Mountain rescue team training',
+    category: 'events',
+    location: 'Patan',
+  },
+  {
+    id: '7',
+    src: 'https://images.pexels.com/photos/1680247/pexels-photo-1680247.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    alt: 'Community cleanup along trekking trail',
+    category: 'community',
+    location: 'Pokhara',
+  },
+  {
+    id: '8',
+    src: 'https://images.pexels.com/photos/247502/pexels-photo-247502.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    alt: 'Wildlife in Himalayan region',
+    category: 'nature',
+    location: 'Sagarmatha National Park',
+  },
+  {
+    id: '9',
+    src: 'https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    alt: 'Traditional festival celebration',
+    category: 'events',
+    location: 'Kathmandu',
+  },
+  {
+    id: '10',
+    src: 'https://images.pexels.com/photos/422218/pexels-photo-422218.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    alt: 'Camping under starlit sky',
+    category: 'hikes',
+    location: 'Annapurna',
+  },
+  {
+    id: '11',
+    src: 'https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    alt: 'Training session for local guides',
+    category: 'events',
+    location: 'Kathmandu',
+  },
+  {
+    id: '12',
+    src: 'https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1200',
+    alt: 'Children learning in mountain school',
+    category: 'community',
+    location: 'Gorkha',
+  },
+];

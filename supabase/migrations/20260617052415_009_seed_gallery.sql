@@ -1,0 +1,14 @@
+-- Seed gallery data
+INSERT INTO gallery (id, title, src, alt, category, location, display_order, is_active) VALUES
+('44444444-4444-4444-4444-444444444401', 'Everest Base Camp', 'https://images.pexels.com/photos/2387878/pexels-photo-2387878.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Everest Base Camp trekker with Himalayan backdrop', 'hikes', 'Everest Base Camp', 1, true),
+('44444444-4444-4444-4444-444444444402', 'Annapurna Sunrise', 'https://images.pexels.com/photos/1321889/pexels-photo-1321889.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Annapurna mountain range at sunrise', 'nature', 'Annapurna', 2, true),
+('44444444-4444-4444-4444-444444444403', 'Langtang Village', 'https://images.pexels.com/photos/3228096/pexels-photo-3228096.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Traditional village in Langtang region', 'community', 'Langtang', 3, true),
+('44444444-4444-4444-4444-444444444404', 'Prayer Flags', 'https://images.pexels.com/photos/1421909/pexels-photo-1421909.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Prayer flags on mountain pass', 'nature', 'Thorong La', 4, true),
+('44444444-4444-4444-4444-444444444405', 'Kathmandu Valley', 'https://images.pexels.com/photos/3025159/pexels-photo-3025159.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Sunrise over Kathmandu valley', 'nature', 'Nagarkot', 5, true),
+('44444444-4444-4444-4444-444444444406', 'Rescue Training', 'https://images.pexels.com/photos/1291962/pexels-photo-1291962.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Mountain rescue team training', 'events', 'Patan', 6, true),
+('44444444-4444-4444-4444-444444444407', 'Community Cleanup', 'https://images.pexels.com/photos/1680247/pexels-photo-1680247.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Community cleanup along trekking trail', 'community', 'Pokhara', 7, true),
+('44444444-4444-4444-4444-444444444408', 'Himalayan Wildlife', 'https://images.pexels.com/photos/247502/pexels-photo-247502.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Wildlife in Himalayan region', 'nature', 'Sagarmatha National Park', 8, true),
+('44444444-4444-4444-4444-444444444409', 'Festival Celebration', 'https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Traditional festival celebration', 'events', 'Kathmandu', 9, true),
+('44444444-4444-4444-4444-444444444410', 'Starry Night Camp', 'https://images.pexels.com/photos/422218/pexels-photo-422218.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Camping under starlit sky', 'hikes', 'Annapurna', 10, true),
+('44444444-4444-4444-4444-444444444411', 'Guide Training', 'https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Training session for local guides', 'events', 'Kathmandu', 11, true),
+('44444444-4444-4444-4444-444444444412', 'Mountain School', 'https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=1200', 'Children learning in mountain school', 'community', 'Gorkha', 12, true);
