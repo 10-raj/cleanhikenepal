@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useState, useEffect } from 'react';
 import { checkIsAdmin } from '../../services/admin';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Mail, DollarSign, Calendar, Settings, Menu, X, Mountain, ImageIcon, Handshake, Megaphone, LogOut } from 'lucide-react';
+import { LayoutDashboard, Mail, DollarSign, Calendar, Settings, Menu, X, Mountain, ImageIcon, Handshake, Megaphone, LogOut, Users } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const navItems = [
@@ -15,6 +15,7 @@ const navItems = [
   { name: 'Donations', path: '/admin/donations', icon: DollarSign },
   { name: 'Messages', path: '/admin/messages', icon: Mail },
   { name: 'Bookings', path: '/admin/bookings', icon: Calendar },
+  { name: 'Team', path: '/admin/team', icon: Users },
   { name: 'Settings', path: '/admin/settings', icon: Settings },
 ];
 

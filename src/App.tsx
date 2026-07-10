@@ -23,15 +23,13 @@ import { AdminGalleryPage } from './pages/admin/AdminGalleryPage';
 import { AdminSponsorsPage } from './pages/admin/AdminSponsorsPage';
 import { AdminCampaignsPage } from './pages/admin/AdminCampaignsPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
+import { AdminTeamPage } from './pages/admin/AdminTeamPage';
 
 function App() {
   return (
     <BrowserRouter>
-      {/* ✅ ADD THIS */}
       <ScrollToTop />
-
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path="hikes" element={<HikesPage />} />
@@ -43,10 +41,8 @@ function App() {
           <Route path="sponsors" element={<SponsorsPage />} />
         </Route>
 
-        {/* Admin Login */}
         <Route path="/admin/login" element={<AdminLoginPage />} />
 
-        {/* Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
           <Route path="hikes" element={<AdminHikesPage />} />
@@ -57,6 +53,7 @@ function App() {
           <Route path="messages" element={<AdminMessagesPage />} />
           <Route path="bookings" element={<AdminBookingsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
+          <Route path="team" element={<AdminTeamPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Target, Eye, Leaf, Users, ArrowRight } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { ScrollReveal } from '../common/ContainerScroll';
+import { supabase } from '../../services/supabase';
 
 const values = [
   {
@@ -30,6 +31,32 @@ const values = [
 
 export function AboutSection() {
 const ref = useRef<HTMLElement>(null);
+const [stats, setStats] = useState([
+    { value: '50+', label: 'Happy Hikkers' },
+    { value: '$0', label: 'Raised for Conservation' },
+    { value: '5+', label: 'Hike Projects' },
+  ]);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const { data } = await supabase
+          .from('website_settings')
+          .select('stat_completed_hikes, stat_volunteers, stat_waste_collected, stat_partners')
+          .limit(1)
+          .maybeSingle();
+        if (data) {
+          setStats([
+            { value: data.stat_completed_hikes || '5+', label: 'Completed Hikes' },
+            { value: data.stat_volunteers || '50+', label: 'Volunteers' },
+            { value: data.stat_waste_collected || '200kg', label: 'Waste Collected' },
+            { value: data.stat_partners || '10+', label: 'Partner Organizations' },
+          ]);
+        }
+      } catch { /* use defaults */ }
+    }
+    fetchStats();
+  }, []);
 
   return (
     <section ref={ref} className="relative py-24 bg-white dark:bg-gray-900 overflow-hidden">
@@ -93,33 +120,19 @@ const ref = useRef<HTMLElement>(null);
               />
             </div>
             <div className="relative p-8 md:p-12 lg:p-16">
-              <div className="grid md:grid-cols-3 gap-8 text-white text-center">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                >
-                  <p className="text-5xl md:text-6xl font-bold mb-2">50+</p>
-                  <p className="text-emerald-200">Happy Hikkers</p>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.1 }}
-                >
-                  <p className="text-5xl md:text-6xl font-bold mb-2">$0</p>
-                  <p className="text-emerald-200">Raised for Conservation</p>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <p className="text-5xl md:text-6xl font-bold mb-2">5+</p>
-                  <p className="text-emerald-200">Hike Projects</p>
-                </motion.div>
+              <div className="grid md:grid-cols-4 gap-8 text-white text-center">
+                {stats.map((stat, i) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                  >
+                    <p className="text-5xl md:text-6xl font-bold mb-2">{stat.value}</p>
+                    <p className="text-emerald-200">{stat.label}</p>
+                  </motion.div>
+                ))}
               </div>
             </div>
           </div>

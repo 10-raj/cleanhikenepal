@@ -97,6 +97,11 @@ export function ContactSection() {
     location: 'Champadevi Trail, Dakshinkali',
     date: 'Every Saturday Morning',
     description: 'Join us for our weekly community clean hike. We meet at the trailhead, hike together, and clean up along the way. All are welcome!',
+    time: '6:00 AM',
+    meeting_point: 'Dakshinkali Temple Entrance',
+    difficulty: 'Moderate',
+    registration_link: '',
+    image: '',
   });
 
   useEffect(() => {
@@ -104,15 +109,20 @@ export function ContactSection() {
       try {
         const { data } = await supabase
           .from('website_settings')
-          .select('next_hike_name, next_hike_location, next_hike_date, next_hike_description')
+          .select('next_hike_name, next_hike_location, next_hike_date, next_hike_description, next_hike_time, next_hike_meeting_point, next_hike_difficulty, next_hike_registration_link, next_hike_image')
           .limit(1)
-          .single();
+          .maybeSingle();
         if (data) {
           setNextHike({
             name: data.next_hike_name || 'Community Clean Hike',
             location: data.next_hike_location || 'Champadevi Trail, Dakshinkali',
             date: data.next_hike_date || 'Every Saturday Morning',
             description: data.next_hike_description || 'Join us for our weekly community clean hike!',
+            time: data.next_hike_time || '6:00 AM',
+            meeting_point: data.next_hike_meeting_point || 'Dakshinkali Temple Entrance',
+            difficulty: data.next_hike_difficulty || 'Moderate',
+            registration_link: data.next_hike_registration_link || '',
+            image: data.next_hike_image || '',
           });
         }
       } catch {
@@ -191,31 +201,54 @@ export function ContactSection() {
 
         {/* Join Us For Clean Hike Banner */}
         <ScrollReveal>
-          <div className="mb-16 p-8 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 text-white relative overflow-hidden">
+          <div className="mb-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 text-white relative overflow-hidden">
+            {nextHike.image && (
+              <div className="absolute inset-0 opacity-20">
+                <img src={nextHike.image} alt={nextHike.name} className="w-full h-full object-cover" />
+              </div>
+            )}
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-            <div className="relative flex flex-col md:flex-row items-start md:items-center gap-6">
+            <div className="relative flex flex-col md:flex-row items-start md:items-center gap-6 p-8">
               <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0">
                 <Mountain className="w-8 h-8" />
               </div>
               <div className="flex-1">
                 <h3 className="text-2xl font-bold mb-2">Join Us For Clean Hike</h3>
                 <p className="text-white/90 mb-4">{nextHike.description}</p>
-                <div className="flex flex-wrap gap-4 text-sm">
+                <div className="flex flex-wrap gap-3 text-sm">
                   <div className="flex items-center gap-2 bg-white/15 rounded-lg px-3 py-1.5">
                     <Calendar className="w-4 h-4" />
                     <span>{nextHike.date}</span>
                   </div>
                   <div className="flex items-center gap-2 bg-white/15 rounded-lg px-3 py-1.5">
+                    <Clock className="w-4 h-4" />
+                    <span>{nextHike.time}</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-white/15 rounded-lg px-3 py-1.5">
                     <MapPin className="w-4 h-4" />
                     <span>{nextHike.location}</span>
                   </div>
+                  <div className="flex items-center gap-2 bg-white/15 rounded-lg px-3 py-1.5">
+                    <Mountain className="w-4 h-4" />
+                    <span>{nextHike.difficulty}</span>
+                  </div>
                 </div>
+                {nextHike.meeting_point && (
+                  <p className="text-white/80 text-sm mt-3 flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    Meeting Point: {nextHike.meeting_point}
+                  </p>
+                )}
               </div>
               <button
                 type="button"
                 onClick={() => {
-                  setSelectedPurpose('join_hike');
-                  document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
+                  if (nextHike.registration_link) {
+                    window.open(nextHike.registration_link, '_blank');
+                  } else {
+                    setSelectedPurpose('join_hike');
+                    document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
+                  }
                 }}
                 className="px-6 py-3 rounded-xl bg-white text-emerald-600 font-semibold hover:bg-emerald-50 transition-colors flex items-center gap-2 flex-shrink-0"
               >
