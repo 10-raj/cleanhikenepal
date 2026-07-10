@@ -409,6 +409,48 @@ export async function updateWebsiteSettings(settings: Record<string, any>) {
 }
 
 // ============================================================
+// Team Members — full CMS CRUD
+// ============================================================
+
+export async function getAllTeamMembers() {
+  const { data, error } = await supabase
+    .from('team_members')
+    .select('*')
+    .order('display_order', { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+export async function createTeamMember(member: Record<string, any>) {
+  const { data, error } = await supabase
+    .from('team_members')
+    .insert([member])
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateTeamMember(id: string, member: Record<string, any>) {
+  const { data, error } = await supabase
+    .from('team_members')
+    .update(member)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteTeamMember(id: string) {
+  const { error } = await supabase
+    .from('team_members')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// ============================================================
 // Donation screenshot upload (storage)
 // ============================================================
 

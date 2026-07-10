@@ -1,10 +1,11 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Mountain, Trees, Heart, Compass } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { supabase } from '../../services/supabase';
 
-const floatingStats = [
+const defaultStats = [
   { icon: Mountain, label: '5+ Hikes', value: 'Explore' },
   { icon: Trees, label: 'Eco-Certified', value: 'Green' },
   { icon: Heart, label: '50+ Donors', value: 'Support' },
@@ -13,6 +14,28 @@ const floatingStats = [
 
 export function HeroSection() {
   const ref = useRef<HTMLDivElement>(null);
+  const [stats, setStats] = useState(defaultStats);
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const { data } = await supabase
+          .from('website_settings')
+          .select('stat_completed_hikes, stat_volunteers, stat_waste_collected, stat_partners')
+          .limit(1)
+          .maybeSingle();
+        if (data) {
+          setStats([
+            { icon: Mountain, label: `${data.stat_completed_hikes || '5+'} Hikes`, value: 'Explore' },
+            { icon: Trees, label: 'Eco-Certified', value: 'Green' },
+            { icon: Heart, label: `${data.stat_volunteers || '50+'} Volunteers`, value: 'Support' },
+            { icon: Compass, label: `${data.stat_partners || '10+'} Partners`, value: 'Assist' },
+          ]);
+        }
+      } catch { /* use defaults */ }
+    }
+    fetchStats();
+  }, []);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ['start start', 'end start'],
@@ -151,7 +174,7 @@ export function HeroSection() {
           transition={{ delay: 1 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto"
         >
-          {floatingStats.map((stat, index) => (
+          {stats.map((stat, index) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 20 }}
