@@ -91,7 +91,6 @@ export function ContactSection() {
   const [partnerType, setPartnerType] = useState<string>('');
   const [numMembers, setNumMembers] = useState<string>('');
   const [howHeard, setHowHeard] = useState<string>('');
-  const [hikeJoinDate, setHikeJoinDate] = useState<string>('');
   const [nextHike, setNextHike] = useState({
     name: 'Community Clean Hike',
     location: 'Champadevi Trail, Dakshinkali',
@@ -153,7 +152,6 @@ export function ContactSection() {
       nextHikeLocation: selectedPurpose === 'join_hike' ? nextHike.location : undefined,
       numberOfMembers: selectedPurpose === 'join_hike' ? (numMembers ? parseInt(numMembers) : undefined) : undefined,
       howHeard: howHeard || undefined,
-      hikeJoinDate: selectedPurpose === 'join_hike' ? (hikeJoinDate || undefined) : undefined,
     });
 
     setSubmitStatus('success');
@@ -163,7 +161,6 @@ export function ContactSection() {
     setPartnerType('');
     setNumMembers('');
     setHowHeard('');
-    setHikeJoinDate('');
   } catch (error) {
     console.error(error);
 
@@ -370,18 +367,6 @@ export function ContactSection() {
                       </div>
                     </div>
 
-                    {/* Preferred Join Date */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        Preferred Hike Date <span className="text-gray-400 font-normal">(optional)</span>
-                      </label>
-                      <input
-                        type="date"
-                        value={hikeJoinDate}
-                        onChange={(e) => setHikeJoinDate(e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
-                      />
-                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
