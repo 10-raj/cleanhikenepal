@@ -15,16 +15,35 @@ export function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const isSupabaseConfigured = !!(
+    import.meta.env.VITE_SUPABASE_URL &&
+    import.meta.env.VITE_SUPABASE_ANON_KEY &&
+    import.meta.env.VITE_SUPABASE_URL !== '' &&
+    import.meta.env.VITE_SUPABASE_ANON_KEY !== ''
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!isSupabaseConfigured) {
+      setError('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment variables (Replit Secrets).');
+      return;
+    }
+
     setLoading(true);
     try {
       await signIn(email, password);
       navigate('/admin', { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Invalid credentials';
-      setError(message);
+      if (message.toLowerCase().includes('invalid') || message.toLowerCase().includes('credentials')) {
+        setError('Invalid email or password. Try: admin@cleanhike.com / CleanHike@2026 — or check Supabase Authentication > Users to verify the account exists.');
+      } else if (message.toLowerCase().includes('network') || message.toLowerCase().includes('fetch')) {
+        setError('Cannot connect to Supabase. Check that VITE_SUPABASE_URL is correct and your project is active.');
+      } else {
+        setError(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -58,6 +77,18 @@ export function AdminLoginPage() {
             <h1 className="text-2xl font-bold">Admin Control Panel</h1>
             <p className="text-white/80 text-sm mt-2">Sign in to manage CleanHike Nepal</p>
           </div>
+
+          {/* Supabase Setup Warning */}
+          {!isSupabaseConfigured && (
+            <div className="px-8 pt-6">
+              <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700">
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 mb-1">Setup Required</p>
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your Replit Secrets to enable login.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="p-8 space-y-6">
