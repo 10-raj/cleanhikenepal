@@ -1,4 +1,4 @@
-import { aiFAQData, keywordPatterns, matchFAQ } from '../data/aiFAQ';
+import { matchFAQ } from '../data/aiFAQ';
 
 export function processUserQuery(query: string): string {
   const normalizedQuery = query.toLowerCase().trim();
@@ -9,15 +9,35 @@ export function processUserQuery(query: string): string {
     return localResponse;
   }
 
+  // Navigation shortcuts — catch common phrasings not in FAQ
+  if (normalizedQuery.includes('gallery') || normalizedQuery.includes('photo') || normalizedQuery.includes('picture')) {
+    return 'Our gallery showcases stunning photos from our expeditions across Nepal\'s beautiful trails!\n\n➡️ [View Gallery](/gallery)';
+  }
+
+  if (normalizedQuery.includes('donate') || normalizedQuery.includes('donation') || normalizedQuery.includes('support us') || normalizedQuery.includes('contribute')) {
+    return 'Thank you for wanting to support us! Your donation helps preserve Nepal\'s natural trails.\n\n➡️ [Donate Now](/donate)';
+  }
+
+  if (normalizedQuery.includes('hike') || normalizedQuery.includes('trek') || normalizedQuery.includes('upcoming')) {
+    return 'Check out our upcoming treks and join us for our next clean hike adventure!\n\n➡️ [View Hikes](/hikes)';
+  }
+
+  if (normalizedQuery.includes('sponsor') || normalizedQuery.includes('partner')) {
+    return 'Meet the amazing sponsors and partners who support our environmental mission!\n\n➡️ [View Sponsors](/sponsors)';
+  }
+
+  if (normalizedQuery.includes('contact') || normalizedQuery.includes('email') || normalizedQuery.includes('phone') || normalizedQuery.includes('reach')) {
+    return 'Get in touch with our team — we respond within 24 hours!\n\n➡️ [Contact Page](/contact)\n\n- **Email:** [acharyaraj2005@gmail.com](mailto:acharyaraj2005@gmail.com)\n- **Phone:** [98767262762](tel:+9779876726276)';
+  }
+
+  if (normalizedQuery.includes('about') || normalizedQuery.includes('who') || normalizedQuery.includes('mission') || normalizedQuery.includes('team')) {
+    return 'Learn about CleanHike Nepal\'s mission, team, and our environmental impact.\n\n➡️ [About Us](/about)';
+  }
+
   // Check for programming/technology questions
   if (normalizedQuery.includes('javascript') || normalizedQuery.includes('react') || normalizedQuery.includes('coding') ||
       normalizedQuery.includes('programming') || normalizedQuery.includes('code')) {
-    return `I can help with general programming questions! However, for specific technical support unrelated to our website:\n\n- **Email**: acharyaraj2005@gmail.com\n- **Contact Page**: Submit your query\n\nOur team will connect you with the right resources.`;
-  }
-
-  // Check for career/advice questions
-  if (normalizedQuery.includes('career') || normalizedQuery.includes('job') || normalizedQuery.includes('work')) {
-    return `For career or professional inquiries, I'd recommend reaching out to our team:\n\n- **Email**: acharyaraj2005@gmail.com\n\nWe may have opportunities in guiding, conservation, or administration!`;
+    return `I'm specialized in helping with CleanHike Nepal information and navigation. For technical support, please contact our team:\n\n- **Email:** [acharyaraj2005@gmail.com](mailto:acharyaraj2005@gmail.com)`;
   }
 
   // Topics we should redirect
@@ -30,10 +50,10 @@ export function processUserQuery(query: string): string {
 
   for (const topics of redirectTopics) {
     if (topics.some(t => normalizedQuery.includes(t))) {
-      return `For specific inquiries about ${topics[0]}, please contact us directly:\n\n- **Email**: acharyaraj2005@gmail.com\n- **Contact Page**: Available on our website\n\nOur team will provide personalized assistance within 24 hours.`;
+      return `For specific inquiries about ${topics[0]}, please contact us directly:\n\n- **Email:** [acharyaraj2005@gmail.com](mailto:acharyaraj2005@gmail.com)\n- **Phone:** [98767262762](tel:+9779876726276)\n\n➡️ [Contact Page](/contact)`;
     }
   }
 
-  // Default fallback for unknown queries
-  return `I couldn't find a specific answer for that question. For further assistance:\n\n- **Email**: acharyaraj2005@gmail.com\n- **Contact Page**: Visit our website to submit an inquiry\n\nI'm here to help with questions about:\n- Completed hikes and trek info\n- Donation methods and environmental mission\n- Nepal travel advice\n- General queries\n\nPlease try rephrasing your question or reach out directly!`;
+  // Default fallback
+  return `I couldn't find that information in the current website. Please contact our team for further assistance:\n\n- **Email:** [acharyaraj2005@gmail.com](mailto:acharyaraj2005@gmail.com)\n- **Phone:** [98767262762](tel:+9779876726276)\n\nOr explore the site:\n- [Home](/)\n- [Hikes](/hikes)\n- [Gallery](/gallery)\n- [Donate](/donate)\n- [Contact](/contact)`;
 }
