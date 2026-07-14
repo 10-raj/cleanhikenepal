@@ -28,21 +28,28 @@ export function AdminLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Don't resolve while auth is still initializing
+    if (loading) return;
+
     async function checkAdmin() {
       if (user) {
-        // Use the role from context first (already fetched from user_profiles)
         if (user.role === 'admin') {
           setIsAdmin(true);
+          setCheckingAdmin(false);
         } else {
-          // Double-check with a direct query as fallback
+          // Fallback: direct DB check (handles edge cases)
           const admin = await checkIsAdmin();
           setIsAdmin(admin);
+          setCheckingAdmin(false);
         }
+      } else {
+        // No user at all after auth resolved → not admin
+        setIsAdmin(false);
+        setCheckingAdmin(false);
       }
-      setCheckingAdmin(false);
     }
     checkAdmin();
-  }, [user]);
+  }, [user, loading]);
 
   const handleSignOut = async () => {
     await signOut();
