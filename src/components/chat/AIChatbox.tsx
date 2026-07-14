@@ -1,8 +1,91 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { X, Send, Bot, Mountain, MessageCircle } from 'lucide-react';
+import { X, Send, Bot, Mountain, MessageCircle, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAIChat } from '../../context/AIChatContext';
 import { suggestedQuestions } from '../../data/aiFAQ';
+
+/** Renders a string with markdown-like links as JSX.
+ *  Supports: [label](url) — internal /paths become <Link>, external become <a> */
+function RenderMessage({ content }: { content: string }) {
+  // Split by lines first
+  const lines = content.split('\n');
+
+  return (
+    <div className="space-y-1 text-sm leading-relaxed">
+      {lines.map((line, lineIdx) => {
+        // Parse inline markdown links
+        const parts: React.ReactNode[] = [];
+        const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+        let lastIndex = 0;
+        let match;
+
+        while ((match = linkRegex.exec(line)) !== null) {
+          // Text before the link
+          if (match.index > lastIndex) {
+            parts.push(
+              <span key={`text-${lineIdx}-${lastIndex}`} dangerouslySetInnerHTML={{
+                __html: line.slice(lastIndex, match.index)
+                  .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                  .replace(/➡️\s*/g, '➡️ ')
+              }} />
+            );
+          }
+          const linkLabel = match[1];
+          const linkHref = match[2];
+          const isExternal = linkHref.startsWith('http') || linkHref.startsWith('mailto:') || linkHref.startsWith('tel:');
+
+          if (isExternal) {
+            if (linkHref.startsWith('mailto:') || linkHref.startsWith('tel:')) {
+              parts.push(
+                <a key={`link-${lineIdx}-${match.index}`} href={linkHref}
+                  className="text-emerald-300 hover:text-emerald-200 underline underline-offset-2 transition-colors">
+                  {linkLabel}
+                </a>
+              );
+            } else {
+              parts.push(
+                <a key={`link-${lineIdx}-${match.index}`} href={linkHref} target="_blank" rel="noopener noreferrer"
+                  className="text-emerald-300 hover:text-emerald-200 underline underline-offset-2 inline-flex items-center gap-0.5 transition-colors">
+                  {linkLabel} <ExternalLink className="w-3 h-3" />
+                </a>
+              );
+            }
+          } else {
+            parts.push(
+              <Link key={`link-${lineIdx}-${match.index}`} to={linkHref}
+                className="text-emerald-300 hover:text-emerald-200 underline underline-offset-2 font-medium transition-colors">
+                {linkLabel}
+              </Link>
+            );
+          }
+          lastIndex = match.index + match[0].length;
+        }
+
+        // Remaining text after last link
+        if (lastIndex < line.length) {
+          parts.push(
+            <span key={`text-${lineIdx}-end`} dangerouslySetInnerHTML={{
+              __html: line.slice(lastIndex)
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            }} />
+          );
+        }
+
+        if (parts.length === 0) {
+          // Plain line with bold support
+          return (
+            <p key={lineIdx} dangerouslySetInnerHTML={{
+              __html: line.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            }} />
+          );
+        }
+
+        return <p key={lineIdx}>{parts}</p>;
+      })}
+    </div>
+  );
+}
 
 export function AIChatbox() {
   const { messages, isOpen, isLoading, sendMessage, toggleChat, clearChat } = useAIChat();
@@ -40,7 +123,7 @@ export function AIChatbox() {
               ${expanded || window.innerWidth < 768 ? 'inset-0 md:inset-auto' : ''}
               md:bottom-20 md:right-0
               w-full md:w-96
-              h-full md:h-[500px]
+              h-full md:h-[520px]
               md:rounded-2xl
               overflow-hidden
               bg-gradient-to-br from-gray-900/95 to-emerald-950/95
@@ -88,67 +171,86 @@ export function AIChatbox() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-4">
-                  <Bot className="w-16 h-16 text-emerald-400 mb-4 animate-bounce" />
-                  <h4 className="text-white font-semibold mb-2">Welcome to CleanHike AI</h4>
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
+              {messages.length === 0 && (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-500/20 to-green-600/20 flex items-center justify-center">
+                    <Bot className="w-8 h-8 text-emerald-400" />
+                  </div>
                   <p className="text-gray-400 text-sm mb-6">
-                    Ask me about hiking trails, eco-tourism, donations, or travel tips for Nepal!
+                    Hello! I can help you navigate the site and answer questions about CleanHike Nepal.
                   </p>
-                  <div className="space-y-2 w-full">
-                    <p className="text-xs text-gray-500 mb-2">Try asking:</p>
-                    {suggestedQuestions.map((q, i) => (
-                      <motion.button
-                        key={i}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleSuggestion(q)}
-                        className="w-full p-3 rounded-xl bg-white/5 hover:bg-white/10 text-emerald-400 text-sm transition-all border border-white/5 hover:border-emerald-500/30"
+                  <div className="space-y-2">
+                    {suggestedQuestions.map((question) => (
+                      <button
+                        key={question}
+                        onClick={() => handleSuggestion(question)}
+                        className="w-full text-left px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 text-xs transition-colors border border-white/5 hover:border-emerald-500/30"
                       >
-                        {q}
-                      </motion.button>
+                        {question}
+                      </button>
                     ))}
                   </div>
                 </div>
-              ) : (
-                <>
-                  {messages.map((msg) => (
-                    <motion.div
-                      key={msg.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`
-                          max-w-[85%] p-4 rounded-2xl
-                          ${msg.sender === 'user'
-                            ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white rounded-br-sm'
-                            : 'bg-white/10 text-gray-200 rounded-bl-sm'
-                          }
-                        `}
-                      >
-                        <p className="text-sm whitespace-pre-line leading-relaxed">{msg.content}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                  {isLoading && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex justify-start"
-                    >
-                      <div className="bg-white/10 p-4 rounded-2xl rounded-bl-sm">
-                        <div className="flex gap-1">
-                          <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <span className="w-2 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </>
+              )}
+
+              {messages.map((message) => (
+                <motion.div
+                  key={message.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`flex gap-3 ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}
+                >
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    message.sender === 'user'
+                      ? 'bg-emerald-500'
+                      : 'bg-gradient-to-br from-emerald-400 to-green-500'
+                  }`}>
+                    {message.sender === 'user' ? (
+                      <span className="text-white text-xs font-bold">U</span>
+                    ) : (
+                      <Mountain className="w-4 h-4 text-white" />
+                    )}
+                  </div>
+                  <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                    message.sender === 'user'
+                      ? 'bg-emerald-500 text-white rounded-tr-sm'
+                      : 'bg-white/10 text-gray-200 rounded-tl-sm'
+                  }`}>
+                    {message.sender === 'ai' ? (
+                      <RenderMessage content={message.content} />
+                    ) : (
+                      <p className="text-sm leading-relaxed">{message.content}</p>
+                    )}
+                    <p className={`text-xs mt-1.5 ${message.sender === 'user' ? 'text-emerald-200' : 'text-gray-500'}`}>
+                      {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+
+              {isLoading && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex gap-3"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center flex-shrink-0">
+                    <Mountain className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="bg-white/10 rounded-2xl rounded-tl-sm px-4 py-3">
+                    <div className="flex gap-1">
+                      {[0, 1, 2].map((i) => (
+                        <motion.div
+                          key={i}
+                          animate={{ scale: [1, 1.5, 1] }}
+                          transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
+                          className="w-2 h-2 rounded-full bg-emerald-400"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
               )}
             </div>
 
@@ -156,12 +258,11 @@ export function AIChatbox() {
             <div className="p-4 border-t border-white/10">
               <div className="flex gap-2">
                 <input
-                  type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask about hiking..."
-                  className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                  placeholder="Ask anything about CleanHike Nepal..."
+                  className="flex-1 bg-white/10 text-white placeholder-gray-400 rounded-xl px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-emerald-500 border border-white/10 focus:border-emerald-500/50"
                 />
                 <motion.button
                   whileHover={{ scale: 1.05 }}
