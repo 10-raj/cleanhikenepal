@@ -8,7 +8,7 @@ import { Input } from '../../components/ui/Input';
 import { ADMIN_CONFIG } from '../../config/admin';
 
 export function AdminLoginPage() {
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,22 +27,33 @@ export function AdminLoginPage() {
     setError(null);
 
     if (!isSupabaseConfigured) {
-      setError('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment variables (Replit Secrets).');
+      setError('Admin panel is not configured yet. Please contact the site administrator.');
       return;
     }
 
     setLoading(true);
     try {
-      await signIn(email, password);
+      const loggedInUser = await signIn(email, password);
+      // signIn returns void but sets user in context — check role after
       navigate('/admin', { replace: true });
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Invalid credentials';
-      if (message.toLowerCase().includes('invalid') || message.toLowerCase().includes('credentials')) {
-        setError('Invalid email or password. Try: admin@cleanhike.com / CleanHike@2026 — or check Supabase Authentication > Users to verify the account exists.');
-      } else if (message.toLowerCase().includes('network') || message.toLowerCase().includes('fetch')) {
-        setError('Cannot connect to Supabase. Check that VITE_SUPABASE_URL is correct and your project is active.');
+      const message = err instanceof Error ? err.message : 'Login failed';
+      if (
+        message.toLowerCase().includes('invalid') ||
+        message.toLowerCase().includes('credentials') ||
+        message.toLowerCase().includes('password')
+      ) {
+        setError('Invalid email or password.');
+      } else if (
+        message.toLowerCase().includes('network') ||
+        message.toLowerCase().includes('fetch') ||
+        message.toLowerCase().includes('failed to fetch')
+      ) {
+        setError('Connection error. Please try again.');
+      } else if (message.toLowerCase().includes('email not confirmed')) {
+        setError('Please confirm your email address before signing in.');
       } else {
-        setError(message);
+        setError('Sign in failed. Please try again.');
       }
     } finally {
       setLoading(false);
