@@ -3,6 +3,7 @@ import { BarChart3, MapPin, Mountain, Image, Video, Map } from 'lucide-react';
 import { getWebsiteSettings, updateWebsiteSettings } from '../../services/admin';
 import { AdminLoading, AdminError, Field, inputClass, SaveBar } from './AdminUI';
 import { ImageUpload } from './ImageUpload';
+import { VideoUpload } from './VideoUpload';
 
 interface SettingsRow {
   id: string;
@@ -114,7 +115,7 @@ export function SettingsManager() {
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">Featured Video (Homepage)</h2>
           </div>
           <div className="space-y-4">
-            <Field label="Video URL (MP4)"><input className={inputClass} value={form.featured_video_url || ''} onChange={e => setForm({ ...form, featured_video_url: e.target.value })} placeholder="https://...mp4" /></Field>
+            <VideoUpload label="Featured Video (upload or paste URL)" value={form.featured_video_url || ''} onChange={url => setForm({ ...form, featured_video_url: url })} />
             <Field label="Title"><input className={inputClass} value={form.featured_video_title || ''} onChange={e => setForm({ ...form, featured_video_title: e.target.value })} /></Field>
             <Field label="Description"><textarea rows={2} className={inputClass} value={form.featured_video_description || ''} onChange={e => setForm({ ...form, featured_video_description: e.target.value })} /></Field>
           </div>
