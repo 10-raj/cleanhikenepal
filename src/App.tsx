@@ -12,6 +12,8 @@ import { GalleryPage } from './pages/GalleryPage';
 import { ContactPage } from './pages/ContactPage';
 import { DonatePage } from './pages/DonatePage';
 import { SponsorsPage } from './pages/SponsorsPage';
+import { PrivacyPage } from './pages/PrivacyPage';
+import { TermsPage } from './pages/TermsPage';
 
 import { AdminLoginPage } from './pages/admin/AdminLoginPage';
 import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
@@ -39,6 +41,8 @@ function App() {
           <Route path="contact" element={<ContactPage />} />
           <Route path="donate" element={<DonatePage />} />
           <Route path="sponsors" element={<SponsorsPage />} />
+          <Route path="privacy" element={<PrivacyPage />} />
+          <Route path="terms" element={<TermsPage />} />
         </Route>
 
         <Route path="/admin/login" element={<AdminLoginPage />} />
