@@ -17,9 +17,11 @@ interface CampaignRow {
   donors_count: number;
   end_date: string | null;
   status: string;
+  location: string;
+  campaign_date: string;
 }
 
-const emptyForm: Partial<CampaignRow> = { title: '', slug: '', description: '', goal_amount: 1000, current_amount: 0, category: 'environmental', image: '', donors_count: 0, end_date: '', status: 'active' };
+const emptyForm: Partial<CampaignRow> = { title: '', slug: '', description: '', goal_amount: 1000, current_amount: 0, category: 'environmental', image: '', donors_count: 0, end_date: '', status: 'active', location: '', campaign_date: '' };
 
 function slugify(s: string) { return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
 
@@ -125,7 +127,18 @@ export function CampaignsManager() {
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2 flex-shrink-0">
+                    <div className="flex gap-2 flex-shrink-0 flex-wrap">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const newStatus = c.status === 'active' ? 'draft' : 'active';
+                          await updateCampaign(c.id, { status: newStatus });
+                          await load();
+                        }}
+                        className={'px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ' + (c.status === 'active' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600')}
+                      >
+                        {c.status === 'active' ? '✓ Published' : '○ Draft'}
+                      </button>
                       <button onClick={() => openEdit(c)} className="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center gap-1.5"><Pencil className="w-4 h-4" /> Edit</button>
                       <button onClick={() => setDeleteTarget(c)} className="px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/30"><Trash2 className="w-4 h-4" /></button>
                     </div>
@@ -148,9 +161,13 @@ export function CampaignsManager() {
             <Field label="Goal Amount (Rs.)" required><input type="number" className={inputClass} value={form.goal_amount || 0} onChange={e => setForm({ ...form, goal_amount: Number(e.target.value) })} /></Field>
             <Field label="Current Amount (Rs.)"><input type="number" className={inputClass} value={form.current_amount || 0} onChange={e => setForm({ ...form, current_amount: Number(e.target.value) })} /></Field>
           </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Field label="Location"><input className={inputClass} value={form.location || ''} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="e.g. Champadevi Trail, Dakshinkali" /></Field>
+            <Field label="Campaign Date"><input type="date" className={inputClass} value={form.campaign_date || ''} onChange={e => setForm({ ...form, campaign_date: e.target.value })} /></Field>
+          </div>
           <div className="grid md:grid-cols-3 gap-4">
             <Field label="Category"><select className={inputClass} value={form.category || 'environmental'} onChange={e => setForm({ ...form, category: e.target.value })}><option value="environmental">Environmental</option><option value="community">Community</option><option value="infrastructure">Infrastructure</option><option value="education">Education</option></select></Field>
-            <Field label="Status"><select className={inputClass} value={form.status || 'active'} onChange={e => setForm({ ...form, status: e.target.value })}><option value="active">Active</option><option value="completed">Completed</option><option value="paused">Paused</option></select></Field>
+            <Field label="Status"><select className={inputClass} value={form.status || 'active'} onChange={e => setForm({ ...form, status: e.target.value })}><option value="active">Active (Published)</option><option value="draft">Draft (Unpublished)</option><option value="completed">Completed</option><option value="paused">Paused</option></select></Field>
             <Field label="End Date"><input type="date" className={inputClass} value={form.end_date || ''} onChange={e => setForm({ ...form, end_date: e.target.value })} /></Field>
           </div>
           <ImageUpload label="Campaign Image" folder="campaigns" value={form.image || ''} onChange={url => setForm({ ...form, image: url })} />
