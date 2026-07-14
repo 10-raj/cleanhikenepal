@@ -17,12 +17,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const fetchUserProfile = useCallback(async (userId: string, userEmail: string): Promise<User> => {
-    // Fetch the user's role from user_profiles table (source of truth for admin role)
+    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@cleanhike.com';
+    const isAdminEmail = userEmail.toLowerCase() === adminEmail.toLowerCase();
+
+    // Fetch the user's role from user_profiles table
     const { data: profile } = await supabase
       .from('user_profiles')
       .select('role, name')
       .eq('id', userId)
       .maybeSingle();
+
+    // If this is the admin email but the profile has user role (first login after account creation),
+    // promote to admin. The trigger creates the row with role='user' by default.
+    if (isAdminEmail && (!profile || profile.role !== 'admin')) {
+      await supabase
+        .from('user_profiles')
+        .upsert({ id: userId, role: 'admin', name: profile?.name || 'Admin' }, { onConflict: 'id' });
+      return {
+        id: userId,
+        email: userEmail,
+        name: profile?.name || 'Admin',
+        role: 'admin',
+      };
+    }
 
     return {
       id: userId,
