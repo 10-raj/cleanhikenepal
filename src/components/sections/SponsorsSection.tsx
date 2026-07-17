@@ -1,14 +1,24 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { sponsorsData } from '../../data/sponsors';
 import { useSponsors } from '../../hooks/useSponsors';
 import { SponsorLogo } from '../cards/SponsorCard';
 import { ScrollReveal } from '../common/ContainerScroll';
+import { Handshake } from 'lucide-react';
 
 export function SponsorsSection() {
   const { sponsors } = useSponsors();
+  const navigate = useNavigate();
   const activeSponsors = sponsors.length > 0 ? sponsors : sponsorsData;
   const duplicatedSponsors = [...activeSponsors, ...activeSponsors];
+
+  const handleContactUsClick = () => {
+    navigate('/contact');
+    setTimeout(() => {
+      const el = document.getElementById('join-as-partner');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+  };
 
   return (
     <section className="py-24 bg-gray-50 dark:bg-gray-950 relative overflow-hidden">
@@ -31,7 +41,7 @@ export function SponsorsSection() {
           </div>
         </ScrollReveal>
 
-        {/* Infinite Scroll Logo Carousel */}
+        {/* Infinite Scroll Logo Carousel — keep existing animation exactly */}
         <div className="relative overflow-hidden mb-12">
           <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-gray-50 dark:from-gray-950 to-transparent z-10" />
           <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-gray-50 dark:from-gray-950 to-transparent z-10" />
@@ -53,15 +63,16 @@ export function SponsorsSection() {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Interested in partnering with CleanHike Nepal?
             </p>
-            <Link
-              to="/contact?partner=true"
+            <button
+              onClick={handleContactUsClick}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white font-medium hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all"
             >
-              Become a Partner
+              <Handshake className="w-4 h-4" />
+              Contact Us — Become a Partner
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
-            </Link>
+            </button>
           </div>
         </ScrollReveal>
       </div>

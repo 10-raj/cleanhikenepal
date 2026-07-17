@@ -29,6 +29,7 @@ interface SettingsRow {
   next_hike_registration_link: string;
   next_hike_map_url: string;
   next_hike_image: string;
+  next_hike_participants: string;
   featured_photo_image: string;
   featured_photo_title: string;
   featured_photo_description: string;
@@ -154,6 +155,7 @@ export function SettingsManager() {
               <Field label="Time"><input className={inputClass} value={form.next_hike_time || ''} onChange={e => setForm({ ...form, next_hike_time: e.target.value })} placeholder="6:00 AM" /></Field>
             </div>
             <Field label="Meeting Point"><input className={inputClass} value={form.next_hike_meeting_point || ''} onChange={e => setForm({ ...form, next_hike_meeting_point: e.target.value })} /></Field>
+            <Field label="Expected Participants"><input className={inputClass} placeholder="e.g. 50 Volunteers" value={(form as any).next_hike_participants || ''} onChange={e => setForm({ ...form, next_hike_participants: e.target.value } as any)} /></Field>
             <Field label="Difficulty"><select className={inputClass} value={form.next_hike_difficulty || 'Moderate'} onChange={e => setForm({ ...form, next_hike_difficulty: e.target.value })}><option>Easy</option><option>Moderate</option><option>Challenging</option><option>Hard</option></select></Field>
             <Field label="Description"><textarea rows={3} className={inputClass} value={form.next_hike_description || ''} onChange={e => setForm({ ...form, next_hike_description: e.target.value })} /></Field>
             <Field label="Registration Link (optional)"><input className={inputClass} value={form.next_hike_registration_link || ''} onChange={e => setForm({ ...form, next_hike_registration_link: e.target.value })} placeholder="https://..." /></Field>

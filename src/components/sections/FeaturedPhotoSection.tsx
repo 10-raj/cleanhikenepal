@@ -15,9 +15,9 @@ interface FeaturedPhoto {
 
 const defaultPhoto: FeaturedPhoto = {
   image: 'https://images.pexels.com/photos/2387878/pexels-photo-2387878.jpeg?auto=compress&cs=tinysrgb&w=1200',
-  title: 'Featured Adventure',
+  title: 'Featured Clean Hikes',
   description: 'Discover the breathtaking beauty of Nepal\'s trails.',
-  link: '',
+  link: '/hikes',
 };
 
 export function FeaturedPhotoSection() {
@@ -36,7 +36,7 @@ export function FeaturedPhotoSection() {
             image: data.featured_photo_image || defaultPhoto.image,
             title: data.featured_photo_title || defaultPhoto.title,
             description: data.featured_photo_description || defaultPhoto.description,
-            link: data.featured_photo_link || '',
+            link: data.featured_photo_link || defaultPhoto.link,
           });
         }
       } catch { /* use defaults */ }
@@ -80,20 +80,21 @@ export function FeaturedPhotoSection() {
               transition={{ duration: 0.6 }}
               className="w-full md:w-1/2"
             >
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-sm font-medium mb-4">
+                Upcoming &amp; Featured Hikes
+              </span>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
                 {photo.title}
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
                 {photo.description}
               </p>
-              {photo.link && (
-                <Link to={photo.link}>
-                  <Button className="group flex items-center">
-                    Learn More
-                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-              )}
+              <Link to={photo.link || '/hikes'}>
+                <Button className="group flex items-center">
+                  Explore More
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
             </motion.div>
           </div>
         </ScrollReveal>
