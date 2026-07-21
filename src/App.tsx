@@ -26,6 +26,8 @@ import { AdminSponsorsPage } from './pages/admin/AdminSponsorsPage';
 import { AdminCampaignsPage } from './pages/admin/AdminCampaignsPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
 import { AdminTeamPage } from './pages/admin/AdminTeamPage';
+import { AdminHomepageManagerPage } from './pages/admin/AdminHomepageManagerPage';
+import { AdminCompletedHikesPage } from './pages/admin/AdminCompletedHikesPage';
 
 function App() {
   return (
@@ -49,6 +51,7 @@ function App() {
 
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminDashboardPage />} />
+          <Route path="homepage" element={<AdminHomepageManagerPage />} />
           <Route path="hikes" element={<AdminHikesPage />} />
           <Route path="gallery" element={<AdminGalleryPage />} />
           <Route path="sponsors" element={<AdminSponsorsPage />} />
@@ -58,6 +61,7 @@ function App() {
           <Route path="bookings" element={<AdminBookingsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="team" element={<AdminTeamPage />} />
+          <Route path="completed-hikes" element={<AdminCompletedHikesPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -35,6 +35,7 @@ const [stats, setStats] = useState([
     { value: '50+', label: 'Happy Hikkers' },
     { value: '$0', label: 'Raised for Conservation' },
     { value: '5+', label: 'Hike Projects' },
+    { value: '200kg+', label: 'Waste Collected' },
   ]);
 
   useEffect(() => {

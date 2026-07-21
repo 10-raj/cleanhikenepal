@@ -2,14 +2,19 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, MapPin, Phone, Send, Clock, CheckCircle, AlertCircle, Heart, Handshake, Users, Mountain, Calendar, User } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import {
+  Mail, MapPin, Phone, Send, Clock, CheckCircle, AlertCircle,
+  Heart, Handshake, Users, Mountain, Calendar, User, Timer, Navigation,
+  Loader2,
+} from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { Input, Textarea } from '../ui/Input';
 import { ScrollReveal } from '../common/ContainerScroll';
 import { InteractiveMap } from '../common/InteractiveMap';
-import { submitContactForm } from '../../services/contact';
 import { supabase } from '../../services/supabase';
+import { submitContactForm } from '../../services/contact';
 
 const purposes = [
   { id: 'general', label: 'General Inquiry', icon: Mail, description: 'Questions about hikes, donations, or anything else' },
@@ -20,31 +25,15 @@ const purposes = [
 ] as const;
 
 const volunteerInterests = [
-  'Trail Cleanup',
-  'Community Outreach',
-  'Event Support',
-  'Photography / Media',
-  'Guiding / Logistics',
-  'Other',
+  'Trail Cleanup', 'Community Outreach', 'Event Support', 'Photography / Media', 'Guiding / Logistics', 'Other',
 ] as const;
 
 const partnerTypes = [
-  'Corporate Sponsor',
-  'NGO / Non-Profit',
-  'Government Body',
-  'Local Business',
-  'Travel Agency',
-  'Other',
+  'Corporate Sponsor', 'NGO / Non-Profit', 'Government Body', 'Local Business', 'Travel Agency', 'Other',
 ] as const;
 
 const howHeardOptions = [
-  'Instagram',
-  'Facebook',
-  'YouTube',
-  'Google Search',
-  'Friend Recommendation',
-  'College/Organization',
-  'Other',
+  'Instagram', 'Facebook', 'YouTube', 'Google Search', 'Friend Recommendation', 'College/Organization', 'Other',
 ] as const;
 
 const contactSchema = z.object({
@@ -58,75 +47,84 @@ const contactSchema = z.object({
 type ContactFormData = z.infer<typeof contactSchema>;
 
 const contactInfo = [
-  {
-    icon: MapPin,
-    title: 'Visit Us',
-    content: 'Dakshinkali, Kathmandu, Nepal',
-    link: '#',
-  },
-  {
-    icon: Mail,
-    title: 'Email Us',
-    content: 'hello@cleanhike.com',
-    link: 'mailto:hello@cleanhike.com',
-  },
-  {
-    icon: Phone,
-    title: 'Call Us',
-    content: '+977 1-423-4567',
-    link: 'tel:+97714234567',
-  },
-  {
-    icon: Clock,
-    title: 'Working Hours',
-    content: 'Mon-Sat, 9AM - 6PM',
-    link: '#',
-  },
+  { icon: MapPin, title: 'Visit Us', content: 'Dakshinkali, Kathmandu, Nepal', link: '#' },
+  { icon: Mail, title: 'Email Us', content: 'acharyaraj2005@gmail.com', link: 'mailto:acharyaraj2005@gmail.com' },
+  { icon: Phone, title: 'Call Us', content: '+977 98767262762', link: 'tel:+9779876726276' },
+  { icon: Clock, title: 'Working Hours', content: 'Mon-Sat, 9AM - 6PM', link: '#' },
 ];
 
+const defaultNextHike = {
+  name: 'Community Clean Hike',
+  location: 'Champadevi Trail, Dakshinkali',
+  date: 'Every Saturday',
+  description: 'Join us for our weekly community clean hike. We meet at the trailhead, hike together, and clean up along the way. All are welcome!',
+  time: '7:00 AM',
+  meeting_point: 'Pharping Bus Park',
+  difficulty: 'Easy',
+  participants: '50 Volunteers',
+  registration_link: '',
+  image: '',
+};
+
 export function ContactSection() {
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const location = useLocation();
+  const formRef = useRef<HTMLDivElement>(null);
+  const upcomingHikeRef = useRef<HTMLDivElement>(null);
+  const joinPartnerRef = useRef<HTMLDivElement>(null);
+
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [selectedPurpose, setSelectedPurpose] = useState<string>('general');
   const [interest, setInterest] = useState<string>('');
   const [partnerType, setPartnerType] = useState<string>('');
   const [numMembers, setNumMembers] = useState<string>('');
   const [howHeard, setHowHeard] = useState<string>('');
-  const [nextHike, setNextHike] = useState({
-    name: 'Community Clean Hike',
-    location: 'Champadevi Trail, Dakshinkali',
-    date: 'Every Saturday Morning',
-    description: 'Join us for our weekly community clean hike. We meet at the trailhead, hike together, and clean up along the way. All are welcome!',
-    time: '6:00 AM',
-    meeting_point: 'Dakshinkali Temple Entrance',
-    difficulty: 'Moderate',
-    registration_link: '',
-    image: '',
-  });
+  const [nextHike, setNextHike] = useState(defaultNextHike);
+
+  // Auto-scroll and auto-select purpose based on URL hash
+  useEffect(() => {
+    const hash = location.hash;
+    if (!hash) return;
+
+    const scrollToSection = (id: string, purpose?: string) => {
+      if (purpose) setSelectedPurpose(purpose);
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 200);
+    };
+
+    if (hash === '#join-us-for-clean-hike') {
+      scrollToSection('join-us-for-clean-hike', 'join_hike');
+    } else if (hash === '#join-as-partner') {
+      scrollToSection('join-as-partner', 'partner');
+    } else if (hash === '#upcoming-hike') {
+      scrollToSection('upcoming-hike');
+    }
+  }, [location.hash]);
 
   useEffect(() => {
     async function fetchNextHike() {
       try {
         const { data } = await supabase
           .from('website_settings')
-          .select('next_hike_name, next_hike_location, next_hike_date, next_hike_description, next_hike_time, next_hike_meeting_point, next_hike_difficulty, next_hike_registration_link, next_hike_image')
+          .select('next_hike_name, next_hike_location, next_hike_date, next_hike_description, next_hike_time, next_hike_meeting_point, next_hike_difficulty, next_hike_registration_link, next_hike_image, next_hike_participants')
           .limit(1)
           .maybeSingle();
         if (data) {
           setNextHike({
-            name: data.next_hike_name || 'Community Clean Hike',
-            location: data.next_hike_location || 'Champadevi Trail, Dakshinkali',
-            date: data.next_hike_date || 'Every Saturday Morning',
-            description: data.next_hike_description || 'Join us for our weekly community clean hike!',
-            time: data.next_hike_time || '6:00 AM',
-            meeting_point: data.next_hike_meeting_point || 'Dakshinkali Temple Entrance',
-            difficulty: data.next_hike_difficulty || 'Moderate',
+            name: data.next_hike_name || defaultNextHike.name,
+            location: data.next_hike_location || defaultNextHike.location,
+            date: data.next_hike_date || defaultNextHike.date,
+            description: data.next_hike_description || defaultNextHike.description,
+            time: data.next_hike_time || defaultNextHike.time,
+            meeting_point: data.next_hike_meeting_point || defaultNextHike.meeting_point,
+            difficulty: data.next_hike_difficulty || defaultNextHike.difficulty,
+            participants: (data as any).next_hike_participants || defaultNextHike.participants,
             registration_link: data.next_hike_registration_link || '',
             image: data.next_hike_image || '',
           });
         }
-      } catch {
-        // Use defaults if settings not available
-      }
+      } catch { /* use defaults */ }
     }
     fetchNextHike();
   }, []);
@@ -134,49 +132,50 @@ export function ContactSection() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     reset,
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
   });
 
   const onSubmit = async (data: ContactFormData) => {
-  try {
-    setSubmitStatus('idle');
+    setSubmitStatus('loading');
+    try {
+      await submitContactForm({
+        ...data,
+        purpose: selectedPurpose,
+        interest: interest || undefined,
+        partnerType: partnerType || undefined,
+        numberOfMembers: numMembers ? parseInt(numMembers) : undefined,
+        howHeard: howHeard || undefined,
+      });
+      setSubmitStatus('success');
+      reset();
+      setInterest('');
+      setPartnerType('');
+      setNumMembers('');
+      setHowHeard('');
+    } catch {
+      setSubmitStatus('error');
+    }
+  };
 
-    await submitContactForm({
-      ...data,
-      purpose: selectedPurpose,
-      interest: selectedPurpose === 'volunteer' ? interest : undefined,
-      partnerType: selectedPurpose === 'partner' ? partnerType : undefined,
-      nextHikeLocation: selectedPurpose === 'join_hike' ? nextHike.location : undefined,
-      numberOfMembers: selectedPurpose === 'join_hike' ? (numMembers ? parseInt(numMembers) : undefined) : undefined,
-      howHeard: howHeard || undefined,
-    });
-
-    setSubmitStatus('success');
-
-    reset();
-    setInterest('');
-    setPartnerType('');
-    setNumMembers('');
-    setHowHeard('');
-  } catch (error) {
-    console.error(error);
-
-    setSubmitStatus('error');
-  }
-};
+  const difficultyColor: Record<string, string> = {
+    Easy: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    Moderate: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+    Challenging: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+    Hard: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  };
 
   return (
-    <section className="py-24 bg-gray-50 dark:bg-gray-950 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-sky-500/5 rounded-full blur-3xl" />
+    <section className="py-24 bg-white dark:bg-gray-900 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-sky-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
         <ScrollReveal>
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-sm font-medium mb-4">
@@ -184,355 +183,372 @@ export function ContactSection() {
               Get in Touch
             </span>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Let's Start Your
-              <br />
+              Contact{' '}
               <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">
-                Nepal Adventure
+                CleanHike Nepal
               </span>
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Have questions about our hikes, donations, or partnership opportunities? We'd love to hear from you.
+              Whether you want to join a hike, partner with us, or just say hello — we'd love to hear from you!
             </p>
           </div>
         </ScrollReveal>
 
-        {/* Join Us For Clean Hike Banner */}
+        {/* Contact Info Cards */}
         <ScrollReveal>
-          <div className="mb-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-green-600 text-white relative overflow-hidden">
-            {nextHike.image && (
-              <div className="absolute inset-0 opacity-20">
-                <img src={nextHike.image} alt={nextHike.name} className="w-full h-full object-cover" />
-              </div>
-            )}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-            <div className="relative flex flex-col md:flex-row items-start md:items-center gap-6 p-8">
-              <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0">
-                <Mountain className="w-8 h-8" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-2xl font-bold mb-2">Join Us For Clean Hike</h3>
-                <p className="text-white/90 mb-4">{nextHike.description}</p>
-                <div className="flex flex-wrap gap-3 text-sm">
-                  <div className="flex items-center gap-2 bg-white/15 rounded-lg px-3 py-1.5">
-                    <Calendar className="w-4 h-4" />
-                    <span>{nextHike.date}</span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-white/15 rounded-lg px-3 py-1.5">
-                    <Clock className="w-4 h-4" />
-                    <span>{nextHike.time}</span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-white/15 rounded-lg px-3 py-1.5">
-                    <MapPin className="w-4 h-4" />
-                    <span>{nextHike.location}</span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-white/15 rounded-lg px-3 py-1.5">
-                    <Mountain className="w-4 h-4" />
-                    <span>{nextHike.difficulty}</span>
-                  </div>
-                </div>
-                {nextHike.meeting_point && (
-                  <p className="text-white/80 text-sm mt-3 flex items-center gap-2">
-                    <MapPin className="w-4 h-4" />
-                    Meeting Point: {nextHike.meeting_point}
-                  </p>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  if (nextHike.registration_link) {
-                    window.open(nextHike.registration_link, '_blank');
-                  } else {
-                    setSelectedPurpose('join_hike');
-                    document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }}
-                className="px-6 py-3 rounded-xl bg-white text-emerald-600 font-semibold hover:bg-emerald-50 transition-colors flex items-center gap-2 flex-shrink-0"
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+            {contactInfo.map((info) => (
+              <motion.a
+                key={info.title}
+                href={info.link}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -4 }}
+                className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:border-emerald-500/50 transition-all text-center group"
               >
-                <Mountain className="w-5 h-5" />
-                Register Now
-              </button>
-            </div>
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-3 group-hover:bg-emerald-500 transition-colors">
+                  <info.icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
+                </div>
+                <p className="font-medium text-gray-900 dark:text-white text-sm mb-1">{info.title}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{info.content}</p>
+              </motion.a>
+            ))}
           </div>
         </ScrollReveal>
 
-        <div className="grid lg:grid-cols-5 gap-12">
-          {/* Contact Info */}
-          <ScrollReveal className="lg:col-span-2">
-            <div className="space-y-6">
-              {contactInfo.map((info) => (
-                <motion.a
-                  key={info.title}
-                  href={info.link}
-                  whileHover={{ x: 5 }}
-                  className="flex items-start gap-4 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:border-emerald-500/30 transition-all group"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0">
-                    <info.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{info.title}</p>
-                    <p className="text-gray-900 dark:text-white font-medium group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                      {info.content}
-                    </p>
-                  </div>
-                </motion.a>
-              ))}
-
-              {/* Interactive Map */}
-              <InteractiveMap />
-            </div>
-          </ScrollReveal>
-
-          {/* Contact Form */}
-          <ScrollReveal className="lg:col-span-3">
-            <motion.form
-              id="contact-form"
-              onSubmit={handleSubmit(onSubmit)}
-              className="p-8 rounded-2xl bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-lg"
+        {/* ─── Upcoming Clean Hike Info Card ─── */}
+        <div id="upcoming-hike" ref={upcomingHikeRef} className="mb-16 scroll-mt-24">
+          <ScrollReveal>
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="rounded-3xl overflow-hidden border border-emerald-200 dark:border-emerald-800 shadow-xl bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/10"
             >
-              {/* Purpose Selection (MCQ-style) */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  How can we help you?
-                </label>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  {purposes.map((purpose) => {
-                    const isSelected = selectedPurpose === purpose.id;
-                    return (
-                      <button
-                        key={purpose.id}
-                        type="button"
-                        onClick={() => setSelectedPurpose(purpose.id)}
-                        className={`flex items-start gap-3 p-4 rounded-xl border text-left transition-all ${
-                          isSelected
-                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 ring-2 ring-emerald-500/20'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-emerald-500/40 bg-white dark:bg-gray-800'
-                        }`}
-                      >
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                          isSelected
-                            ? 'bg-gradient-to-br from-emerald-500 to-green-600 text-white'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
-                        }`}>
-                          <purpose.icon className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className={`text-sm font-medium ${isSelected ? 'text-emerald-700 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
-                            {purpose.label}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{purpose.description}</p>
-                        </div>
-                      </button>
-                    );
-                  })}
+              {/* Card header */}
+              <div className="bg-gradient-to-r from-emerald-600 to-green-600 px-6 py-4 flex items-center gap-3">
+                <Mountain className="w-6 h-6 text-white" />
+                <div>
+                  <h3 className="text-xl font-bold text-white">Next Community Clean Hike</h3>
+                  <p className="text-emerald-100 text-sm">{nextHike.name}</p>
                 </div>
               </div>
 
-              {/* Conditional: Join Hike fields */}
-              <AnimatePresence>
-                {selectedPurpose === 'join_hike' && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden mb-6"
-                  >
-                    {/* Next Hike Location (read-only, admin-editable) */}
-                    <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 mb-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">Next Hike Location</span>
-                      </div>
-                      <p className="text-gray-700 dark:text-gray-300 font-medium">{nextHike.name} — {nextHike.location}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{nextHike.date}</p>
+              <div className="p-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mb-6">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 shadow flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-5 h-5 text-emerald-600" />
                     </div>
-
-                    {/* Number of Members */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        Number of Members <span className="text-gray-400 font-normal">(including you)</span>
-                      </label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input
-                          type="number"
-                          min="1"
-                          max="50"
-                          value={numMembers}
-                          onChange={(e) => setNumMembers(e.target.value)}
-                          placeholder="1"
-                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
-                        />
-                      </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">Location</p>
+                      <p className="font-semibold text-gray-900 dark:text-white text-sm mt-0.5">{nextHike.location}</p>
                     </div>
+                  </div>
 
-                  </motion.div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 shadow flex items-center justify-center flex-shrink-0">
+                      <Calendar className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">Date</p>
+                      <p className="font-semibold text-gray-900 dark:text-white text-sm mt-0.5">{nextHike.date}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 shadow flex items-center justify-center flex-shrink-0">
+                      <Timer className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">Time</p>
+                      <p className="font-semibold text-gray-900 dark:text-white text-sm mt-0.5">{nextHike.time}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 shadow flex items-center justify-center flex-shrink-0">
+                      <Navigation className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">Meeting Point</p>
+                      <p className="font-semibold text-gray-900 dark:text-white text-sm mt-0.5">{nextHike.meeting_point}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 shadow flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">Expected Participants</p>
+                      <p className="font-semibold text-gray-900 dark:text-white text-sm mt-0.5">{nextHike.participants}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-white dark:bg-gray-800 shadow flex items-center justify-center flex-shrink-0">
+                      <Mountain className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">Difficulty</p>
+                      <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-full mt-0.5 ${difficultyColor[nextHike.difficulty] || difficultyColor['Easy']}`}>
+                        {nextHike.difficulty}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {nextHike.description && (
+                  <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-emerald-200/60 dark:border-emerald-800/60 pt-4">
+                    {nextHike.description}
+                  </p>
                 )}
-              </AnimatePresence>
-
-              {/* Conditional: Volunteer interests (MCQ) */}
-              <AnimatePresence>
-                {selectedPurpose === 'volunteer' && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden mb-6"
-                  >
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                      Which area interests you? <span className="text-gray-400 font-normal">(optional)</span>
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {volunteerInterests.map((item) => (
-                        <button
-                          key={item}
-                          type="button"
-                          onClick={() => setInterest(interest === item ? '' : item)}
-                          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                            interest === item
-                              ? 'bg-emerald-500 text-white'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
-                          }`}
-                        >
-                          {item}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Conditional: Partner type (MCQ) */}
-              <AnimatePresence>
-                {selectedPurpose === 'partner' && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden mb-6"
-                  >
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                      What type of partner? <span className="text-gray-400 font-normal">(optional)</span>
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {partnerTypes.map((item) => (
-                        <button
-                          key={item}
-                          type="button"
-                          onClick={() => setPartnerType(partnerType === item ? '' : item)}
-                          className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                            partnerType === item
-                              ? 'bg-emerald-500 text-white'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30'
-                          }`}
-                        >
-                          {item}
-                        </button>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <Input
-                  {...register('name')}
-                  id="name"
-                  label="Your Name"
-                  placeholder="John Doe"
-                  error={errors.name?.message}
-                />
-                <Input
-                  {...register('email')}
-                  id="email"
-                  type="email"
-                  label="Email Address"
-                  placeholder="john@example.com"
-                  error={errors.email?.message}
-                />
               </div>
-              <div className="grid md:grid-cols-2 gap-6 mt-6">
+            </motion.div>
+          </ScrollReveal>
+        </div>
+
+        {/* ─── Contact Form ─── */}
+        <div className="grid lg:grid-cols-2 gap-12 mb-16">
+          {/* Purpose Selector + Form */}
+          <ScrollReveal>
+            <div id="join-us-for-clean-hike" ref={formRef} className="scroll-mt-24">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Send us a Message</h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-6">Choose your inquiry type and fill in the form below.</p>
+
+              {/* Purpose Selector */}
+              <div className="grid grid-cols-1 gap-3 mb-8">
+                {purposes.map((purpose) => {
+                  const isSelected = selectedPurpose === purpose.id;
+                  const Icon = purpose.icon;
+                  const anchorId = purpose.id === 'join_hike'
+                    ? 'join-us-for-clean-hike'
+                    : purpose.id === 'partner'
+                      ? 'join-as-partner'
+                      : undefined;
+                  return (
+                    <div key={purpose.id} id={purpose.id === 'partner' ? 'join-as-partner' : undefined} className="scroll-mt-24">
+                      <motion.button
+                        type="button"
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        onClick={() => setSelectedPurpose(purpose.id)}
+                        className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left ${
+                          isSelected
+                            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
+                            : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700'
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                          isSelected ? 'bg-emerald-500' : 'bg-gray-100 dark:bg-gray-700'
+                        }`}>
+                          <Icon className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`} />
+                        </div>
+                        <div>
+                          <p className={`font-semibold text-sm ${isSelected ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-900 dark:text-white'}`}>
+                            {purpose.label}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{purpose.description}</p>
+                        </div>
+                        {isSelected && (
+                          <CheckCircle className="w-5 h-5 text-emerald-500 ml-auto flex-shrink-0" />
+                        )}
+                      </motion.button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Form */}
+              <motion.form
+                onSubmit={handleSubmit(onSubmit)}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-5"
+              >
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <Input
+                    {...register('name')}
+                    id="name"
+                    label="Full Name *"
+                    placeholder="Your name"
+                    error={errors.name?.message}
+                  />
+                  <Input
+                    {...register('email')}
+                    id="email"
+                    label="Email *"
+                    type="email"
+                    placeholder="your@email.com"
+                    error={errors.email?.message}
+                  />
+                </div>
+
                 <Input
                   {...register('phone')}
                   id="phone"
-                  type="tel"
-                  label="Phone Number"
-                  placeholder="+977 98XXXXXXXX"
+                  label="Phone (Optional)"
+                  placeholder="+977 9XXXXXXXX"
                   error={errors.phone?.message}
                 />
+
+                {/* Volunteer interest */}
+                {selectedPurpose === 'volunteer' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Area of Interest</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {volunteerInterests.map(opt => (
+                        <button
+                          type="button"
+                          key={opt}
+                          onClick={() => setInterest(opt)}
+                          className={`px-3 py-2 rounded-xl text-sm border transition-all ${
+                            interest === opt
+                              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
+                              : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Partner type */}
+                {selectedPurpose === 'partner' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Organization Type</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {partnerTypes.map(opt => (
+                        <button
+                          type="button"
+                          key={opt}
+                          onClick={() => setPartnerType(opt)}
+                          className={`px-3 py-2 rounded-xl text-sm border transition-all ${
+                            partnerType === opt
+                              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
+                              : 'border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Number of members for group hike */}
+                {selectedPurpose === 'join_hike' && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      How many people will be joining?
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={numMembers}
+                      onChange={e => setNumMembers(e.target.value)}
+                      placeholder="e.g. 3"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                    />
+                  </div>
+                )}
+
                 <Input
                   {...register('subject')}
                   id="subject"
-                  label="Subject"
-                  placeholder="Inquiry about Everest Base Camp trek"
+                  label="Subject *"
+                  placeholder="How can we help you?"
                   error={errors.subject?.message}
                 />
-              </div>
 
-              {/* How did you hear about us? (dropdown, always visible) */}
-              <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  How did you hear about us? <span className="text-gray-400 font-normal">(optional)</span>
-                </label>
-                <select
-                  value={howHeard}
-                  onChange={(e) => setHowHeard(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
-                >
-                  <option value="">Select an option...</option>
-                  {howHeardOptions.map((option) => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
+                {/* How did you hear */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    How did you hear about us?
+                  </label>
+                  <select
+                    value={howHeard}
+                    onChange={e => setHowHeard(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  >
+                    <option value="">Select option...</option>
+                    {howHeardOptions.map(opt => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="mt-6">
                 <Textarea
                   {...register('message')}
                   id="message"
-                  label="Message"
+                  label="Message *"
                   rows={5}
                   placeholder="Tell us about your inquiry..."
                   error={errors.message?.message}
                 />
-              </div>
-              {/* Status Messages */}
-              {submitStatus === 'success' && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 flex items-center gap-3"
-                >
-                  <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                  <div>
-                    <p className="font-medium text-emerald-800 dark:text-emerald-200">Message sent successfully!</p>
-                    <p className="text-sm text-emerald-600 dark:text-emerald-400">We'll get back to you within 24 hours.</p>
-                  </div>
-                </motion.div>
-              )}
 
-              {submitStatus === 'error' && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-center gap-3"
-                >
-                  <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-                  <div>
-                    <p className="font-medium text-red-800 dark:text-red-200">Failed to send message</p>
-                    <p className="text-sm text-red-600 dark:text-red-400">Please try again or email us directly.</p>
-                  </div>
-                </motion.div>
-              )}
+                {/* Status Messages */}
+                <AnimatePresence>
+                  {submitStatus === 'success' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 flex items-center gap-3"
+                    >
+                      <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-emerald-800 dark:text-emerald-200">Message sent successfully!</p>
+                        <p className="text-sm text-emerald-600 dark:text-emerald-400">We'll get back to you within 24 hours.</p>
+                      </div>
+                    </motion.div>
+                  )}
+                  {submitStatus === 'error' && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 flex items-center gap-3"
+                    >
+                      <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-red-800 dark:text-red-200">Failed to send message</p>
+                        <p className="text-sm text-red-600 dark:text-red-400">Please try again or email us directly at acharyaraj2005@gmail.com</p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-              <div className="mt-8">
-                <Button type="submit" size="lg" className="w-full" isLoading={isSubmitting}>
-                  <Send className="w-5 h-5 mr-2" />
-                  Send Message
-                </Button>
+                <button
+                  type="submit"
+                  disabled={submitStatus === 'loading'}
+                  className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-base shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
+                >
+                  {submitStatus === 'loading' ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Sending...</>
+                  ) : (
+                    <><Send className="w-5 h-5" /> Send Message</>
+                  )}
+                </button>
+              </motion.form>
+            </div>
+          </ScrollReveal>
+
+          {/* Map & Location */}
+          <ScrollReveal>
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Find Us</h3>
+                <p className="text-gray-500 dark:text-gray-400">We're based in Kathmandu, Nepal — come visit us!</p>
               </div>
-            </motion.form>
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-700 h-[400px]">
+                <InteractiveMap />
+              </div>
+            </div>
           </ScrollReveal>
         </div>
       </div>

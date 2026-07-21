@@ -3,12 +3,17 @@ import { useAuth } from '../../context/AuthContext';
 import { useState, useEffect } from 'react';
 import { checkIsAdmin } from '../../services/admin';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Mail, DollarSign, Calendar, Settings, Menu, X, Mountain, ImageIcon, Handshake, Megaphone, LogOut, Users } from 'lucide-react';
+import {
+  LayoutDashboard, Mail, DollarSign, Calendar, Settings, Menu, X,
+  Mountain, ImageIcon, Handshake, Megaphone, LogOut, Users, Home, Layout, CheckCircle,
+} from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+  { name: 'Homepage Manager', path: '/admin/homepage', icon: Home },
   { name: 'Hikes', path: '/admin/hikes', icon: Mountain },
+  { name: 'Completed Hikes', path: '/admin/completed-hikes', icon: CheckCircle },
   { name: 'Gallery', path: '/admin/gallery', icon: ImageIcon },
   { name: 'Sponsors', path: '/admin/sponsors', icon: Handshake },
   { name: 'Campaigns', path: '/admin/campaigns', icon: Megaphone },
@@ -28,22 +33,18 @@ export function AdminLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Don't resolve while auth is still initializing
     if (loading) return;
-
     async function checkAdmin() {
       if (user) {
         if (user.role === 'admin') {
           setIsAdmin(true);
           setCheckingAdmin(false);
         } else {
-          // Fallback: direct DB check (handles edge cases)
           const admin = await checkIsAdmin();
           setIsAdmin(admin);
           setCheckingAdmin(false);
         }
       } else {
-        // No user at all after auth resolved → not admin
         setIsAdmin(false);
         setCheckingAdmin(false);
       }
@@ -58,7 +59,7 @@ export function AdminLayout() {
 
   if (loading || checkingAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500" />
       </div>
     );
@@ -74,61 +75,65 @@ export function AdminLayout() {
       <motion.aside
         initial={false}
         animate={{ width: sidebarOpen ? 256 : 80 }}
-        className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col"
+        className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col flex-shrink-0"
+        style={{ minWidth: sidebarOpen ? 256 : 80 }}
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
           <Link to="/admin" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center flex-shrink-0">
               <LayoutDashboard className="w-5 h-5 text-white" />
             </div>
             {sidebarOpen && (
-              <span className="font-bold text-gray-900 dark:text-white">Admin</span>
+              <span className="font-bold text-gray-900 dark:text-white whitespace-nowrap">Admin Panel</span>
             )}
           </Link>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 flex-shrink-0"
           >
             {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
+                title={!sidebarOpen ? item.name : undefined}
                 className={`
                   flex items-center gap-3 px-4 py-3 rounded-xl transition-all
                   ${isActive
-                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                    ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-medium'
                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }
                 `}
               >
                 <item.icon className="w-5 h-5 flex-shrink-0" />
-                {sidebarOpen && <span>{item.name}</span>}
+                {sidebarOpen && <span className="truncate">{item.name}</span>}
               </Link>
             );
           })}
         </nav>
 
-        {/* Sign Out */}
+        {/* Footer */}
         <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
           <Link
             to="/"
+            title={!sidebarOpen ? 'Back to Site' : undefined}
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
           >
-            <Settings className="w-5 h-5 flex-shrink-0" />
+            <Layout className="w-5 h-5 flex-shrink-0" />
             {sidebarOpen && <span>Back to Site</span>}
           </Link>
           <button
             onClick={handleSignOut}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+            title={!sidebarOpen ? 'Sign Out' : undefined}
           >
             <LogOut className="w-5 h-5 flex-shrink-0" />
             {sidebarOpen && <span>Sign Out</span>}

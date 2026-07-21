@@ -451,6 +451,48 @@ export async function deleteTeamMember(id: string) {
 }
 
 // ============================================================
+// Completed Hikes — full CMS CRUD
+// ============================================================
+
+export async function getAllCompletedHikesAdmin() {
+  const { data, error } = await supabase
+    .from('completed_hikes')
+    .select('*')
+    .order('display_order', { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+export async function createCompletedHike(hike: Record<string, any>) {
+  const { data, error } = await supabase
+    .from('completed_hikes')
+    .insert([hike])
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateCompletedHike(id: string, hike: Record<string, any>) {
+  const { data, error } = await supabase
+    .from('completed_hikes')
+    .update(hike)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteCompletedHike(id: string) {
+  const { error } = await supabase
+    .from('completed_hikes')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// ============================================================
 // Donation screenshot upload (storage)
 // ============================================================
 
