@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Mountain } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { ChevronLeft, ChevronRight, Mountain, Camera, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
 
 export interface BannerSlide {
@@ -13,6 +13,7 @@ export interface BannerSlide {
   button_link: string;
   sort_order: number;
   is_active: boolean;
+  icon?: 'mountain' | 'camera';
 }
 
 const defaultSlides: BannerSlide[] = [
@@ -25,26 +26,18 @@ const defaultSlides: BannerSlide[] = [
     button_link: '/contact#join-us-for-clean-hike',
     sort_order: 1,
     is_active: true,
+    icon: 'mountain',
   },
   {
     id: 'default-2',
-    image: 'https://images.pexels.com/photos/1423600/pexels-photo-1423600.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    title: 'Protect Nepal\'s Himalayan Trails',
-    subtitle: 'Hike with purpose. Clean as you go. Make a lasting impact on Nepal\'s natural heritage.',
-    button_text: 'Join Upcoming Clean Hike',
-    button_link: '/contact#join-us-for-clean-hike',
+    image: 'https://images.pexels.com/photos/12715946/pexels-photo-12715946.jpeg?auto=compress&cs=tinysrgb&w=1920',
+    title: 'Our Moments',
+    subtitle: 'Captured memories from our clean hikes and community events. Relive the trails, the smiles, and the impact.',
+    button_text: 'View Gallery',
+    button_link: '/gallery',
     sort_order: 2,
     is_active: true,
-  },
-  {
-    id: 'default-3',
-    image: 'https://images.pexels.com/photos/1680247/pexels-photo-1680247.jpeg?auto=compress&cs=tinysrgb&w=1920',
-    title: 'Adventure with a Purpose',
-    subtitle: 'Experience Nepal\'s stunning landscapes while helping clean the trails. Every volunteer makes a difference.',
-    button_text: 'Join Upcoming Clean Hike',
-    button_link: '/contact#join-us-for-clean-hike',
-    sort_order: 3,
-    is_active: true,
+    icon: 'camera',
   },
 ];
 
@@ -147,6 +140,7 @@ export function BannerCarousel() {
   };
 
   return (
+    <>
     <div
       className="relative w-full overflow-hidden"
       style={{ height: 'clamp(420px, 70vh, 720px)' }}
@@ -187,7 +181,7 @@ export function BannerCarousel() {
                 transition={{ delay: 0.2 }}
                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 backdrop-blur-md border border-emerald-400/30 text-emerald-300 text-sm font-medium mb-6"
               >
-                <Mountain className="w-4 h-4" />
+                {slide.icon === 'camera' ? <Camera className="w-4 h-4" /> : <Mountain className="w-4 h-4" />}
                 CleanHike Nepal
               </motion.div>
 
@@ -223,7 +217,7 @@ export function BannerCarousel() {
                   onClick={() => handleCTAClick(slide.button_link)}
                   className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-lg shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all duration-300"
                 >
-                  <Mountain className="w-5 h-5" />
+                  {slide.icon === 'camera' ? <Camera className="w-5 h-5" /> : <Mountain className="w-5 h-5" />}
                   {slide.button_text}
                 </button>
               </motion.div>
@@ -275,5 +269,6 @@ export function BannerCarousel() {
         />
       )}
     </div>
+    </>
   );
 }

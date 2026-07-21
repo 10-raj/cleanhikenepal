@@ -14,13 +14,13 @@ export function HomePage() {
     <>
       <BannerCarousel />
       <HeroSection />
-      <GalleryPreviewSection />
       <FeaturedPhotoSection />
       <AboutSection />
       <CompletedHikesSection />
       <EnvironmentalMissionSection />
       <FeaturedVideoSection />
       <SponsorsSection />
+      <GalleryPreviewSection />
       <ContactSection />
     </>
   );

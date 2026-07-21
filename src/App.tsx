@@ -27,6 +27,7 @@ import { AdminCampaignsPage } from './pages/admin/AdminCampaignsPage';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
 import { AdminTeamPage } from './pages/admin/AdminTeamPage';
 import { AdminHomepageManagerPage } from './pages/admin/AdminHomepageManagerPage';
+import { AdminCompletedHikesPage } from './pages/admin/AdminCompletedHikesPage';
 
 function App() {
   return (
@@ -60,6 +61,7 @@ function App() {
           <Route path="bookings" element={<AdminBookingsPage />} />
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="team" element={<AdminTeamPage />} />
+          <Route path="completed-hikes" element={<AdminCompletedHikesPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

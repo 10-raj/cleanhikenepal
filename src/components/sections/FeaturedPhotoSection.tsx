@@ -17,7 +17,7 @@ const defaultPhoto: FeaturedPhoto = {
   image: 'https://images.pexels.com/photos/2387878/pexels-photo-2387878.jpeg?auto=compress&cs=tinysrgb&w=1200',
   title: 'Featured Clean Hikes',
   description: 'Discover the breathtaking beauty of Nepal\'s trails.',
-  link: '/hikes',
+  link: '/gallery',
 };
 
 export function FeaturedPhotoSection() {
@@ -89,7 +89,7 @@ export function FeaturedPhotoSection() {
               <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
                 {photo.description}
               </p>
-              <Link to={photo.link || '/hikes'}>
+              <Link to={photo.link || '/gallery'}>
                 <Button className="group flex items-center">
                   Explore More
                   <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />

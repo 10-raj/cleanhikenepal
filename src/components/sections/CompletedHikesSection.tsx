@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 import { Link } from 'react-router-dom';
 import { ArrowRight, Filter, CheckCircle } from 'lucide-react';
-import { completedHikes } from '../../data/completedHikes';
+import { completedHikes as fallbackHikes, CompletedHike } from '../../data/completedHikes';
 import { CompletedHikeCard } from '../cards/CompletedHikeCard';
+import { supabase } from '../../services/supabase';
 
 import { Button } from '../ui/Button';
 import { ScrollReveal } from '../common/ContainerScroll';
@@ -12,11 +13,41 @@ const difficulties = ['All', 'Easy', 'Moderate', 'Challenging', 'Hard'];
 
 export function CompletedHikesSection() {
   const [selectedDifficulty, setSelectedDifficulty] = useState('All');
+  const [hikes, setHikes] = useState<CompletedHike[]>(fallbackHikes);
+
+  useEffect(() => {
+    async function fetchCompletedHikes() {
+      try {
+        const { data, error } = await supabase
+          .from('completed_hikes')
+          .select('*')
+          .eq('is_active', true)
+          .order('display_order', { ascending: true });
+        if (!error && data && data.length > 0) {
+          const mapped: CompletedHike[] = data.map((h: any) => ({
+            id: h.id,
+            name: h.name,
+            location: h.location,
+            elevation: h.elevation || '',
+            distance: h.distance || '',
+            duration: h.duration || '',
+            difficulty: h.difficulty,
+            completedDate: h.completed_date,
+            image: h.image || '',
+            description: h.description || '',
+            highlights: h.highlights || [],
+          }));
+          setHikes(mapped);
+        }
+      } catch { /* use fallback */ }
+    }
+    fetchCompletedHikes();
+  }, []);
 
   const filteredHikes = useMemo(() => {
-    if (selectedDifficulty === 'All') return completedHikes;
-    return completedHikes.filter(hike => hike.difficulty === selectedDifficulty);
-  }, [selectedDifficulty]);
+    if (selectedDifficulty === 'All') return hikes;
+    return hikes.filter(hike => hike.difficulty === selectedDifficulty);
+  }, [selectedDifficulty, hikes]);
 
   return (
     <section className="py-24 bg-gray-50 dark:bg-gray-950 relative overflow-hidden">

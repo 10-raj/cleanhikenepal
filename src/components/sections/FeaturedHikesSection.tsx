@@ -32,7 +32,7 @@ export function FeaturedHikesSection() {
                 Explore our most beloved trails, handpicked for their stunning views and cultural significance.
               </p>
             </div>
-            <Link to="/hikes">
+            <Link to="/gallery">
               <Button variant="outline" className="group">
                 View All Hikes
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
