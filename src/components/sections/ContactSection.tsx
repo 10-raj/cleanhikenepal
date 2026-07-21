@@ -47,11 +47,26 @@ const contactSchema = z.object({
 type ContactFormData = z.infer<typeof contactSchema>;
 
 const contactInfo = [
-  { icon: MapPin, title: 'Visit Us', content: 'Dakshinkali, Kathmandu, Nepal', link: '#' },
-  { icon: Mail, title: 'Email Us', content: 'acharyaraj2005@gmail.com', link: 'mailto:acharyaraj2005@gmail.com' },
+  { icon: MapPin, title: 'Visit Us', content: 'Dakshinkali, Kathmandu, Nepal', link: null },
+  { icon: Mail, title: 'Email Us', content: 'acharyaraj2005@gmail.com', link: 'mailto:acharyaraj2005@gmail.com', isEmail: true },
   { icon: Phone, title: 'Call Us', content: '+977 98767262762', link: 'tel:+9779876726276' },
-  { icon: Clock, title: 'Working Hours', content: 'Mon-Sat, 9AM - 6PM', link: '#' },
+  { icon: Clock, title: 'Working Hours', content: 'Mon-Sat, 9AM - 6PM', link: null },
 ];
+
+/** Desktop browsers open mailto: via the OS default mail client (often Outlook),
+ * ignoring that the business actually uses Gmail. Mobile already resolves
+ * mailto: to the Gmail app correctly via OS-level intent handling, so this
+ * only needs to special-case desktop: open Gmail's web compose instead. */
+function isMobileDevice() {
+  if (typeof navigator === 'undefined') return false;
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+function handleEmailClick(e: React.MouseEvent, email: string) {
+  if (isMobileDevice()) return; // let the native mailto: -> Gmail app handoff happen
+  e.preventDefault();
+  window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${email}`, '_blank', 'noopener,noreferrer');
+}
 
 const defaultNextHike = {
   name: 'Community Clean Hike',
@@ -199,23 +214,49 @@ export function ContactSection() {
         {/* Contact Info Cards */}
         <ScrollReveal>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
-            {contactInfo.map((info) => (
-              <motion.a
-                key={info.title}
-                href={info.link}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -4 }}
-                className="p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:border-emerald-500/50 transition-all text-center group"
-              >
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-3 group-hover:bg-emerald-500 transition-colors">
-                  <info.icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
-                </div>
-                <p className="font-medium text-gray-900 dark:text-white text-sm mb-1">{info.title}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{info.content}</p>
-              </motion.a>
-            ))}
+            {contactInfo.map((info) => {
+              const cardClass = "p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:border-emerald-500/50 transition-all text-center group";
+              const cardContent = (
+                <>
+                  <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center mx-auto mb-3 group-hover:bg-emerald-500 transition-colors">
+                    <info.icon className="w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
+                  </div>
+                  <p className="font-medium text-gray-900 dark:text-white text-sm mb-1">{info.title}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{info.content}</p>
+                </>
+              );
+
+              if (!info.link) {
+                // Visit Us / Working Hours: hover animation only, not clickable
+                return (
+                  <motion.div
+                    key={info.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    whileHover={{ y: -4 }}
+                    className={`${cardClass} cursor-default select-none`}
+                  >
+                    {cardContent}
+                  </motion.div>
+                );
+              }
+
+              return (
+                <motion.a
+                  key={info.title}
+                  href={info.link}
+                  onClick={info.isEmail ? (e) => handleEmailClick(e, 'acharyaraj2005@gmail.com') : undefined}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -4 }}
+                  className={cardClass}
+                >
+                  {cardContent}
+                </motion.a>
+              );
+            })}
           </div>
         </ScrollReveal>
 
@@ -396,6 +437,27 @@ export function ContactSection() {
                   error={errors.phone?.message}
                 />
 
+                {/* Next Clean Hike — read-only, auto-populated from the Admin Panel.
+                    Only shown for the Join Us for Clean Hike purpose, between
+                    Phone and "How many people will be joining". */}
+                {selectedPurpose === 'join_hike' && (
+                  <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/10 p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Next Clean Hike</p>
+                      <span className="text-[10px] uppercase tracking-wide text-emerald-500 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">Auto-filled</span>
+                    </div>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      <span className="font-medium text-gray-900 dark:text-white">Date:</span> {nextHike.date}
+                    </p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                      <span className="font-medium text-gray-900 dark:text-white">Location:</span> {nextHike.location}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      This is set automatically from the Admin Panel and can't be edited here.
+                    </p>
+                  </div>
+                )}
+
                 {/* Volunteer interest */}
                 {selectedPurpose === 'volunteer' && (
                   <div>
@@ -547,7 +609,7 @@ export function ContactSection() {
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Find Us</h3>
                 <p className="text-gray-500 dark:text-gray-400">We're based in Kathmandu, Nepal — come visit us!</p>
               </div>
-              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-700 h-[400px]">
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-700 h-[320px] sm:h-[380px] lg:h-[420px]">
                 <InteractiveMap />
               </div>
             </div>

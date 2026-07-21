@@ -48,11 +48,11 @@ export function InteractiveMap() {
   }, []);
 
   return (
-    <div className="relative rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-lg h-72 md:h-80">
+    <div className="relative w-full h-full">
       <iframe
         src={embedUrl}
         title="Next Hike Location"
-        className="w-full h-full"
+        className="w-full h-full block"
         style={{ border: 0 }}
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
