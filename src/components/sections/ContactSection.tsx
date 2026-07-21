@@ -97,6 +97,8 @@ export function ContactSection() {
       scrollToSection('join-us-for-clean-hike', 'join_hike');
     } else if (hash === '#join-as-partner') {
       scrollToSection('join-as-partner', 'partner');
+    } else if (hash === '#join-as-volunteer') {
+      scrollToSection('join-as-volunteer', 'volunteer');
     } else if (hash === '#upcoming-hike') {
       scrollToSection('upcoming-hike');
     }
@@ -323,13 +325,13 @@ export function ContactSection() {
                 {purposes.map((purpose) => {
                   const isSelected = selectedPurpose === purpose.id;
                   const Icon = purpose.icon;
-                  const anchorId = purpose.id === 'join_hike'
-                    ? 'join-us-for-clean-hike'
-                    : purpose.id === 'partner'
-                      ? 'join-as-partner'
+                  const anchorId = purpose.id === 'partner'
+                    ? 'join-as-partner'
+                    : purpose.id === 'volunteer'
+                      ? 'join-as-volunteer'
                       : undefined;
                   return (
-                    <div key={purpose.id} id={purpose.id === 'partner' ? 'join-as-partner' : undefined} className="scroll-mt-24">
+                    <div key={purpose.id} id={anchorId} className="scroll-mt-24">
                       <motion.button
                         type="button"
                         whileHover={{ scale: 1.01 }}

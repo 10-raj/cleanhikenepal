@@ -11,7 +11,7 @@ const quickLinks = [
 
 const supportLinks = [
   { name: 'Donate Now', path: '/donate' },
-  { name: 'Volunteer', path: '/contact?volunteer=true' },
+  { name: 'Volunteer', path: '/contact#join-as-volunteer' },
   { name: 'Corporate Partnerships', path: '/sponsors' },
   { name: 'Environmental Programs', path: '/about#environment' },
 ];

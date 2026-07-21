@@ -5,6 +5,7 @@ import { supabase } from '../../services/supabase';
 import { BannerSlide } from '../sections/BannerCarousel';
 import { ImageUpload } from './ImageUpload';
 import { AdminLoading, AdminError, inputClass } from './AdminUI';
+import { CMS_LINK_OPTIONS } from '../../utils/navigateToLink';
 
 const defaultBanner: Omit<BannerSlide, 'id'> = {
   image: '',
@@ -15,6 +16,51 @@ const defaultBanner: Omit<BannerSlide, 'id'> = {
   sort_order: 0,
   is_active: true,
 };
+
+/** Shared dropdown + external-URL field for a banner's button destination. */
+function LinkPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (link: string) => void;
+}) {
+  const matched = CMS_LINK_OPTIONS.find(o => o.value === value);
+  const isExternal = !matched && !!value;
+  const [mode, setMode] = useState<string>(isExternal ? '__external__' : (matched?.value || CMS_LINK_OPTIONS[0].value));
+  const [customUrl, setCustomUrl] = useState(isExternal ? value : '');
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Button Links To</label>
+      <select
+        className={inputClass}
+        value={mode}
+        onChange={e => {
+          const next = e.target.value;
+          setMode(next);
+          if (next === '__external__') {
+            onChange(customUrl);
+          } else {
+            onChange(next);
+          }
+        }}
+      >
+        {CMS_LINK_OPTIONS.map(opt => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
+      {mode === '__external__' && (
+        <input
+          className={`${inputClass} mt-2`}
+          placeholder="https://example.com"
+          value={customUrl}
+          onChange={e => { setCustomUrl(e.target.value); onChange(e.target.value); }}
+        />
+      )}
+    </div>
+  );
+}
 
 export function BannerManager() {
   const [banners, setBanners] = useState<BannerSlide[]>([]);
@@ -220,10 +266,19 @@ export function BannerManager() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Subtitle</label>
                 <input className={inputClass} placeholder="Banner subtitle/description" value={newBanner.subtitle} onChange={e => setNewBanner(b => ({ ...b, subtitle: e.target.value }))} />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Button Link</label>
-                <input className={inputClass} placeholder="/contact#join-us-for-clean-hike" value={newBanner.button_link} onChange={e => setNewBanner(b => ({ ...b, button_link: e.target.value }))} />
-              </div>
+              <LinkPicker
+                value={newBanner.button_link}
+                onChange={link => setNewBanner(b => ({ ...b, button_link: link }))}
+              />
+              <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                <input
+                  type="checkbox"
+                  checked={newBanner.button_visible !== false}
+                  onChange={e => setNewBanner(b => ({ ...b, button_visible: e.target.checked }))}
+                  className="rounded"
+                />
+                Show button on this banner
+              </label>
 
               <button
                 onClick={handleAdd}
@@ -335,10 +390,19 @@ function EditBannerForm({
         <input className={inputClass} value={form.image} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} />
         {form.image && <img src={form.image} alt="preview" className="mt-2 w-full h-32 object-cover rounded-xl" />}
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Button Link</label>
-        <input className={inputClass} value={form.button_link} onChange={e => setForm(f => ({ ...f, button_link: e.target.value }))} />
-      </div>
+      <LinkPicker
+        value={form.button_link}
+        onChange={link => setForm(f => ({ ...f, button_link: link }))}
+      />
+      <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+        <input
+          type="checkbox"
+          checked={form.button_visible !== false}
+          onChange={e => setForm(f => ({ ...f, button_visible: e.target.checked }))}
+          className="rounded"
+        />
+        Show button on this banner
+      </label>
       <div className="flex gap-3">
         <button
           onClick={() => onSave(form)}

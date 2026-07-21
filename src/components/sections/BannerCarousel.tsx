@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Mountain, Camera, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
+import { navigateToLink } from '../../utils/navigateToLink';
 
 export interface BannerSlide {
   id: string;
@@ -11,6 +12,7 @@ export interface BannerSlide {
   subtitle: string;
   button_text: string;
   button_link: string;
+  button_visible?: boolean;
   sort_order: number;
   is_active: boolean;
   icon?: 'mountain' | 'camera';
@@ -103,20 +105,7 @@ export function BannerCarousel() {
     startAutoplay();
   };
 
-  const handleCTAClick = (link: string) => {
-    if (link.startsWith('/contact#')) {
-      const hash = link.split('#')[1];
-      navigate('/contact');
-      setTimeout(() => {
-        const el = document.getElementById(hash);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 300);
-    } else if (link.startsWith('/')) {
-      navigate(link);
-    } else {
-      window.open(link, '_blank');
-    }
-  };
+  const handleCTAClick = (link: string) => navigateToLink(link, navigate);
 
   if (slides.length === 0) return null;
 
@@ -208,19 +197,21 @@ export function BannerCarousel() {
               </motion.p>
 
               {/* CTA Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-              >
-                <button
-                  onClick={() => handleCTAClick(slide.button_link)}
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-lg shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all duration-300"
+              {slide.button_visible !== false && slide.button_text && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
                 >
-                  {slide.icon === 'camera' ? <Camera className="w-5 h-5" /> : <Mountain className="w-5 h-5" />}
-                  {slide.button_text}
-                </button>
-              </motion.div>
+                  <button
+                    onClick={() => handleCTAClick(slide.button_link)}
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-lg shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all duration-300"
+                  >
+                    {slide.icon === 'camera' ? <Camera className="w-5 h-5" /> : <Mountain className="w-5 h-5" />}
+                    {slide.button_text}
+                  </button>
+                </motion.div>
+              )}
             </div>
           </div>
         </motion.div>
