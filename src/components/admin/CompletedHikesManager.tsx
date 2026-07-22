@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Mountain, Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Mountain, Plus, Pencil, Trash2, Search, Eye, EyeOff, ArrowUp, ArrowDown } from 'lucide-react';
 import {
   getAllCompletedHikesAdmin,
   createCompletedHike,
@@ -17,6 +17,7 @@ import {
   inputClass,
   SaveBar,
 } from './AdminUI';
+import { ImageUpload } from './ImageUpload';
 import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 interface CompletedHikeRow {
@@ -144,6 +145,40 @@ export function CompletedHikesManager() {
     }
   }
 
+  async function handleToggleActive(h: CompletedHikeRow) {
+    try {
+      await updateCompletedHike(h.id, { is_active: !h.is_active });
+      setItems(prev => prev.map(i => i.id === h.id ? { ...i, is_active: !i.is_active } : i));
+      showSuccess(h.is_active ? 'Completed hike unpublished.' : 'Completed hike published.');
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to toggle visibility.'));
+    }
+  }
+
+  async function handleMove(idx: number, direction: 'up' | 'down') {
+    if (direction === 'up' && idx === 0) return;
+    if (direction === 'down' && idx === filtered.length - 1) return;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    const a = filtered[idx];
+    const b = filtered[swapIdx];
+    setItems(prev => {
+      const next = [...prev];
+      const ai = next.findIndex(i => i.id === a.id);
+      const bi = next.findIndex(i => i.id === b.id);
+      [next[ai], next[bi]] = [next[bi], next[ai]];
+      return next;
+    });
+    try {
+      await Promise.all([
+        updateCompletedHike(a.id, { display_order: b.display_order }),
+        updateCompletedHike(b.id, { display_order: a.display_order }),
+      ]);
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to reorder.'));
+      await load();
+    }
+  }
+
   const filtered = items.filter(
     h => !search || h.name?.toLowerCase().includes(search.toLowerCase())
   );
@@ -231,6 +266,27 @@ export function CompletedHikesManager() {
                     className="flex-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center gap-1.5"
                   >
                     <Pencil className="w-4 h-4" /> Edit
+                  </button>
+                  <button
+                    onClick={() => handleToggleActive(h)}
+                    className="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                    title={h.is_active ? 'Unpublish' : 'Publish'}
+                  >
+                    {h.is_active ? <Eye className="w-4 h-4 text-emerald-500" /> : <EyeOff className="w-4 h-4 text-gray-400" />}
+                  </button>
+                  <button
+                    onClick={() => handleMove(filtered.indexOf(h), 'up')}
+                    disabled={filtered.indexOf(h) === 0}
+                    className="px-2 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-30"
+                  >
+                    <ArrowUp className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleMove(filtered.indexOf(h), 'down')}
+                    disabled={filtered.indexOf(h) === filtered.length - 1}
+                    className="px-2 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-30"
+                  >
+                    <ArrowDown className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setDeleteTarget(h)}
@@ -325,14 +381,12 @@ export function CompletedHikesManager() {
               />
             </Field>
           </div>
-          <Field label="Image URL">
-            <input
-              className={inputClass}
-              value={form.image || ''}
-              onChange={e => setForm({ ...form, image: e.target.value })}
-              placeholder="https://..."
-            />
-          </Field>
+          <ImageUpload
+            label="Hike Photo"
+            folder="completed-hikes"
+            value={form.image || ''}
+            onChange={url => setForm({ ...form, image: url })}
+          />
           <Field label="Description">
             <textarea
               rows={3}

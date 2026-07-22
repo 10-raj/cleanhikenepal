@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ImageIcon, Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { ImageIcon, Plus, Pencil, Trash2, Search, Eye, EyeOff, ArrowUp, ArrowDown } from 'lucide-react';
 import { getAllGalleryAdmin, createGalleryImage, updateGalleryImage, deleteGalleryImage } from '../../services/admin';
 import { AdminLoading, AdminEmpty, AdminError, ConfirmDialog, AdminModal, Field, inputClass, SaveBar } from './AdminUI';
 import { ImageUpload } from './ImageUpload';
@@ -62,6 +62,40 @@ export function GalleryManager() {
     finally { setDeleting(false); }
   }
 
+  async function handleToggleActive(g: GalleryRow) {
+    try {
+      await updateGalleryImage(g.id, { is_active: !g.is_active });
+      setItems(prev => prev.map(i => i.id === g.id ? { ...i, is_active: !i.is_active } : i));
+      showSuccess(g.is_active ? 'Image hidden.' : 'Image published.');
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to toggle visibility.'));
+    }
+  }
+
+  async function handleMove(idx: number, direction: 'up' | 'down') {
+    if (direction === 'up' && idx === 0) return;
+    if (direction === 'down' && idx === filtered.length - 1) return;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    const a = filtered[idx];
+    const b = filtered[swapIdx];
+    setItems(prev => {
+      const next = [...prev];
+      const ai = next.findIndex(i => i.id === a.id);
+      const bi = next.findIndex(i => i.id === b.id);
+      [next[ai], next[bi]] = [next[bi], next[ai]];
+      return next;
+    });
+    try {
+      await Promise.all([
+        updateGalleryImage(a.id, { display_order: b.display_order }),
+        updateGalleryImage(b.id, { display_order: a.display_order }),
+      ]);
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to reorder.'));
+      await load();
+    }
+  }
+
   const filtered = items.filter(g => !search || g.title?.toLowerCase().includes(search.toLowerCase()) || g.category?.toLowerCase().includes(search.toLowerCase()));
 
   if (loading) return <AdminLoading />;
@@ -94,8 +128,11 @@ export function GalleryManager() {
                 {g.src ? <img src={g.src} alt={g.alt} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gray-200 dark:bg-gray-700" />}
                 {!g.is_active && <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-gray-800/70 text-white text-xs">Hidden</span>}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
-                  <button onClick={() => openEdit(g)} className="p-2 rounded-lg bg-white/90 text-gray-800 hover:bg-white"><Pencil className="w-4 h-4" /></button>
-                  <button onClick={() => setDeleteTarget(g)} className="p-2 rounded-lg bg-red-500/90 text-white hover:bg-red-500"><Trash2 className="w-4 h-4" /></button>
+                  <button onClick={() => openEdit(g)} className="p-2 rounded-lg bg-white/90 text-gray-800 hover:bg-white" title="Edit"><Pencil className="w-4 h-4" /></button>
+                  <button onClick={() => handleToggleActive(g)} className="p-2 rounded-lg bg-white/90 text-gray-800 hover:bg-white" title={g.is_active ? 'Hide' : 'Publish'}>{g.is_active ? <Eye className="w-4 h-4 text-emerald-500" /> : <EyeOff className="w-4 h-4 text-gray-400" />}</button>
+                  <button onClick={() => handleMove(filtered.indexOf(g), 'up')} disabled={filtered.indexOf(g) === 0} className="p-2 rounded-lg bg-white/90 text-gray-800 hover:bg-white disabled:opacity-30" title="Move up"><ArrowUp className="w-4 h-4" /></button>
+                  <button onClick={() => handleMove(filtered.indexOf(g), 'down')} disabled={filtered.indexOf(g) === filtered.length - 1} className="p-2 rounded-lg bg-white/90 text-gray-800 hover:bg-white disabled:opacity-30" title="Move down"><ArrowDown className="w-4 h-4" /></button>
+                  <button onClick={() => setDeleteTarget(g)} className="p-2 rounded-lg bg-red-500/90 text-white hover:bg-red-500" title="Delete"><Trash2 className="w-4 h-4" /></button>
                 </div>
               </div>
               <div className="p-3">

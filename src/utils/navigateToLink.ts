@@ -38,6 +38,7 @@ export function navigateToLink(link: string, navigate: NavigateFunction) {
 /** Options shown in the Admin Panel's Dynamic Link Dropdown. */
 export const CMS_LINK_OPTIONS: { label: string; value: string }[] = [
   { label: 'Home', value: '/' },
+  { label: 'Featured Hikes', value: '/hikes?filter=featured' },
   { label: 'Completed Hikes', value: '/#completed-hikes' },
   { label: 'Hikes', value: '/hikes' },
   { label: 'About', value: '/about' },
@@ -45,8 +46,8 @@ export const CMS_LINK_OPTIONS: { label: string; value: string }[] = [
   { label: 'Contact', value: '/contact' },
   { label: 'Join Us for Clean Hike', value: '/contact#join-us-for-clean-hike' },
   { label: 'Sponsors', value: '/sponsors' },
-  { label: 'Join as Partner', value: '/contact#join-as-partner' },
-  { label: 'Join as Volunteer', value: '/contact#join-as-volunteer' },
+  { label: 'Partners', value: '/contact#join-as-partner' },
   { label: 'Donate', value: '/donate' },
+  { label: 'Volunteer', value: '/contact#join-as-volunteer' },
   { label: 'External URL', value: '__external__' },
 ];

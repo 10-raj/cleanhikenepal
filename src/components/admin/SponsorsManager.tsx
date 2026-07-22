@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Handshake, Plus, Pencil, Trash2, Search } from 'lucide-react';
+import { Handshake, Plus, Pencil, Trash2, Search, Eye, EyeOff, ArrowUp, ArrowDown } from 'lucide-react';
 import { getAllSponsorsAdmin, createSponsor, updateSponsor, deleteSponsor } from '../../services/admin';
 import { AdminLoading, AdminEmpty, AdminError, ConfirmDialog, AdminModal, Field, inputClass, SaveBar } from './AdminUI';
 import { ImageUpload } from './ImageUpload';
@@ -62,6 +62,40 @@ export function SponsorsManager() {
     finally { setDeleting(false); }
   }
 
+  async function handleToggleActive(s: SponsorRow) {
+    try {
+      await updateSponsor(s.id, { is_active: !s.is_active });
+      setItems(prev => prev.map(i => i.id === s.id ? { ...i, is_active: !i.is_active } : i));
+      showSuccess(s.is_active ? 'Sponsor hidden.' : 'Sponsor published.');
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to toggle visibility.'));
+    }
+  }
+
+  async function handleMove(idx: number, direction: 'up' | 'down') {
+    if (direction === 'up' && idx === 0) return;
+    if (direction === 'down' && idx === filtered.length - 1) return;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    const a = filtered[idx];
+    const b = filtered[swapIdx];
+    setItems(prev => {
+      const next = [...prev];
+      const ai = next.findIndex(i => i.id === a.id);
+      const bi = next.findIndex(i => i.id === b.id);
+      [next[ai], next[bi]] = [next[bi], next[ai]];
+      return next;
+    });
+    try {
+      await Promise.all([
+        updateSponsor(a.id, { display_order: b.display_order }),
+        updateSponsor(b.id, { display_order: a.display_order }),
+      ]);
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to reorder.'));
+      await load();
+    }
+  }
+
   const filtered = items.filter(s => !search || s.name?.toLowerCase().includes(search.toLowerCase()));
 
   const tierColors: Record<string, string> = {
@@ -108,6 +142,9 @@ export function SponsorsManager() {
               {!s.is_active && <span className="inline-block mb-3 px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs">Inactive</span>}
               <div className="flex gap-2">
                 <button onClick={() => openEdit(s)} className="flex-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center gap-1.5"><Pencil className="w-4 h-4" /> Edit</button>
+                <button onClick={() => handleToggleActive(s)} className="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" title={s.is_active ? 'Hide' : 'Publish'}>{s.is_active ? <Eye className="w-4 h-4 text-emerald-500" /> : <EyeOff className="w-4 h-4 text-gray-400" />}</button>
+                <button onClick={() => handleMove(filtered.indexOf(s), 'up')} disabled={filtered.indexOf(s) === 0} className="px-2 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-30" title="Move up"><ArrowUp className="w-4 h-4" /></button>
+                <button onClick={() => handleMove(filtered.indexOf(s), 'down')} disabled={filtered.indexOf(s) === filtered.length - 1} className="px-2 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-30" title="Move down"><ArrowDown className="w-4 h-4" /></button>
                 <button onClick={() => setDeleteTarget(s)} className="px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/30"><Trash2 className="w-4 h-4" /></button>
               </div>
             </motion.div>

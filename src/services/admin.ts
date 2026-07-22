@@ -512,3 +512,88 @@ export async function uploadDonationScreenshot(file: File): Promise<string> {
 
   return data.publicUrl;
 }
+
+// ============================================================
+// About Content — full CMS CRUD
+// ============================================================
+
+export async function getAllAboutContent() {
+  const { data, error } = await supabase
+    .from('about_content')
+    .select('*')
+    .order('section', { ascending: true })
+    .order('display_order', { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+export async function createAboutContent(item: Record<string, any>) {
+  const { data, error } = await supabase
+    .from('about_content')
+    .insert([item])
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateAboutContent(id: string, item: Record<string, any>) {
+  const { data, error } = await supabase
+    .from('about_content')
+    .update(item)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteAboutContent(id: string) {
+  const { error } = await supabase
+    .from('about_content')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}
+
+// ============================================================
+// Hero Banners — full CMS CRUD
+// ============================================================
+
+export async function getAllBannersAdmin() {
+  const { data, error } = await supabase
+    .from('hero_banners')
+    .select('*')
+    .order('sort_order', { ascending: true });
+  if (error) throw error;
+  return data;
+}
+
+export async function createBanner(banner: Record<string, any>) {
+  const { data, error } = await supabase
+    .from('hero_banners')
+    .insert([banner])
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateBanner(id: string, banner: Record<string, any>) {
+  const { data, error } = await supabase
+    .from('hero_banners')
+    .update(banner)
+    .eq('id', id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteBanner(id: string) {
+  const { error } = await supabase
+    .from('hero_banners')
+    .delete()
+    .eq('id', id);
+  if (error) throw error;
+}

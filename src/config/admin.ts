@@ -36,7 +36,7 @@
 
 export const ADMIN_CONFIG = {
   /** Default email shown as a placeholder on the login screen. */
-  defaultEmail: import.meta.env.VITE_ADMIN_EMAIL || 'admin@cleanhike.com',
+  defaultEmail: import.meta.env.VITE_ADMIN_EMAIL || 'acharyaraj2005@gmail.com',
   /** Optional hint displayed under the login form. */
   hint: import.meta.env.VITE_ADMIN_HINT || '',
   /** Route the admin area lives under. */
