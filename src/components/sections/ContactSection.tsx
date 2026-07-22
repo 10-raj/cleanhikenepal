@@ -48,7 +48,7 @@ type ContactFormData = z.infer<typeof contactSchema>;
 
 const contactInfo = [
   { icon: MapPin, title: 'Visit Us', content: 'Dakshinkali, Kathmandu, Nepal', link: null },
-  { icon: Mail, title: 'Email Us', content: 'acharyaraj2005@gmail.com', link: 'mailto:acharyaraj2005@gmail.com', isEmail: true },
+  { icon: Mail, title: 'Email Us', content: 'info@cleanhikenepal.com', link: 'mailto:info@cleanhikenepal.com', isEmail: true },
   { icon: Phone, title: 'Call Us', content: '+977 98767262762', link: 'tel:+9779876726276' },
   { icon: Clock, title: 'Working Hours', content: 'Mon-Sat, 9AM - 6PM', link: null },
 ];
@@ -246,7 +246,7 @@ export function ContactSection() {
                 <motion.a
                   key={info.title}
                   href={info.link}
-                  onClick={info.isEmail ? (e) => handleEmailClick(e, 'acharyaraj2005@gmail.com') : undefined}
+                  onClick={info.isEmail ? (e) => handleEmailClick(e, 'info@cleanhikenepal.com') : undefined}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
