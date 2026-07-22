@@ -12,6 +12,16 @@ interface TeamMember {
   social_links?: Record<string, string>;
 }
 
+interface AboutContentItem {
+  id: string;
+  section: string;
+  title: string | null;
+  subtitle: string | null;
+  description: string | null;
+  image: string | null;
+  designation: string | null;
+}
+
 const fallbackTeam: TeamMember[] = [
   { name: 'Avib Adhikari', role: 'Founder & CEO', image: 'https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=400', bio: 'Lifetime mountaineer with 30+ years of Himalayan experience' },
   { name: 'Umang Raj Gurung', role: 'Environmental Director', image: 'https://images.pexels.com/photos/3764119/pexels-photo-3764119.jpeg?auto=compress&cs=tinysrgb&w=400', bio: 'Environmental scientist specializing in sustainable tourism' },
@@ -30,6 +40,10 @@ const milestones = [
 
 export function AboutPage() {
   const [team, setTeam] = useState<TeamMember[]>(fallbackTeam);
+  const [mission, setMission] = useState<string>('To provide transformative trekking experiences while actively preserving Nepal\'s natural environment and supporting the communities that make these journeys possible.');
+  const [vision, setVision] = useState<string>('A future where adventure tourism and environmental stewardship work hand-in-hand, creating a model for sustainable development across the Himalayan region.');
+  const [historyText, setHistoryText] = useState<string | null>(null);
+  const [founders, setFounders] = useState<AboutContentItem[]>([]);
 
   useEffect(() => {
     async function fetchTeam() {
@@ -42,7 +56,28 @@ export function AboutPage() {
         if (data && data.length > 0) setTeam(data);
       } catch { /* use fallback */ }
     }
+    async function fetchAboutContent() {
+      try {
+        const { data } = await supabase
+          .from('about_content')
+          .select('id, section, title, subtitle, description, image, designation')
+          .eq('is_active', true)
+          .eq('status', 'published')
+          .order('display_order', { ascending: true });
+        if (data) {
+          const missionItem = data.find(d => d.section === 'mission');
+          if (missionItem?.description) setMission(missionItem.description);
+          const visionItem = data.find(d => d.section === 'vision');
+          if (visionItem?.description) setVision(visionItem.description);
+          const historyItem = data.find(d => d.section === 'history');
+          if (historyItem?.description) setHistoryText(historyItem.description);
+          const founderItems = data.filter(d => d.section === 'founders');
+          if (founderItems.length > 0) setFounders(founderItems);
+        }
+      } catch { /* use fallback */ }
+    }
     fetchTeam();
+    fetchAboutContent();
   }, []);
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
@@ -91,16 +126,14 @@ export function AboutPage() {
               <Target className="w-12 h-12 mb-6" />
               <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
               <p className="text-emerald-100 leading-relaxed">
-                To provide transformative trekking experiences while actively preserving Nepal's natural
-                environment and supporting the communities that make these journeys possible.
+                {mission}
               </p>
             </div>
             <div className="p-8 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white">
               <Eye className="w-12 h-12 mb-6" />
               <h2 className="text-2xl font-bold mb-4">Our Vision</h2>
               <p className="text-sky-100 leading-relaxed">
-                A future where adventure tourism and environmental stewardship work hand-in-hand,
-                creating a model for sustainable development across the Himalayan region.
+                {vision}
               </p>
             </div>
           </div>
@@ -137,6 +170,39 @@ export function AboutPage() {
             </ScrollReveal>
           ))}
         </div>
+
+        {/* History */}
+        {historyText && (
+          <ScrollReveal>
+            <div className="mb-20 max-w-3xl mx-auto text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">Our History</h2>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg">{historyText}</p>
+            </div>
+          </ScrollReveal>
+        )}
+
+        {/* Founders */}
+        {founders.length > 0 && (
+          <ScrollReveal>
+            <div className="mb-20">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">Our Founders</h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {founders.map((f) => (
+                  <div key={f.id} className="text-center">
+                    {f.image && (
+                      <div className="relative mb-4 inline-block">
+                        <img src={f.image} alt={f.title || ''} className="w-40 h-40 rounded-full object-cover mx-auto border-4 border-emerald-500" />
+                      </div>
+                    )}
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">{f.title}</h3>
+                    {f.designation && <p className="text-emerald-600 dark:text-emerald-400 font-medium mb-2">{f.designation}</p>}
+                    {f.description && <p className="text-gray-600 dark:text-gray-400 text-sm">{f.description}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
+        )}
 
         {/* Timeline */}
         <ScrollReveal>

@@ -7,14 +7,17 @@ import { motion } from 'framer-motion';
 import {
   LayoutDashboard, Mail, DollarSign, Calendar, Settings, Menu, X,
   Mountain, ImageIcon, Handshake, Megaphone, LogOut, Users, Home, Layout, CheckCircle,
+  Info, GalleryHorizontalEnd, Sparkle,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
   { name: 'Homepage Manager', path: '/admin/homepage', icon: Home },
+  { name: 'Banner Manager', path: '/admin/banners', icon: GalleryHorizontalEnd },
   { name: 'Hikes', path: '/admin/hikes', icon: Mountain },
   { name: 'Completed Hikes', path: '/admin/completed-hikes', icon: CheckCircle },
+  { name: 'About Page', path: '/admin/about', icon: Info },
   { name: 'Gallery', path: '/admin/gallery', icon: ImageIcon },
   { name: 'Sponsors', path: '/admin/sponsors', icon: Handshake },
   { name: 'Campaigns', path: '/admin/campaigns', icon: Megaphone },
@@ -22,6 +25,7 @@ const navItems = [
   { name: 'Messages', path: '/admin/messages', icon: Mail },
   { name: 'Bookings', path: '/admin/bookings', icon: Calendar },
   { name: 'Team', path: '/admin/team', icon: Users },
+  { name: 'Logo Manager', path: '/admin/logo', icon: Sparkle },
   { name: 'Settings', path: '/admin/settings', icon: Settings },
 ];
 

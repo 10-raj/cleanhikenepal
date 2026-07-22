@@ -185,7 +185,7 @@ export function ContactSection() {
   };
 
   return (
-    <section className="py-24 bg-white dark:bg-gray-900 relative overflow-hidden">
+    <section className="pt-24 pb-12 bg-white dark:bg-gray-900 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-sky-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
@@ -354,7 +354,7 @@ export function ContactSection() {
         </div>
 
         {/* ─── Contact Form ─── */}
-        <div className="grid lg:grid-cols-2 gap-12 mb-16">
+        <div className="grid lg:grid-cols-2 gap-12">
           {/* Purpose Selector + Form */}
           <ScrollReveal>
             <div id="join-us-for-clean-hike" ref={formRef} className="scroll-mt-24">

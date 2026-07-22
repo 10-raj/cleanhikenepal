@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Mountain, Plus, Pencil, Trash2, Search, Star } from 'lucide-react';
+import { Mountain, Plus, Pencil, Trash2, Search, Star, Eye, EyeOff } from 'lucide-react';
 import { getAllHikesAdmin, createHike, updateHike, deleteHike } from '../../services/admin';
 import { AdminLoading, AdminEmpty, AdminError, ConfirmDialog, AdminModal, Field, inputClass, SaveBar } from './AdminUI';
 import { ImageUpload } from './ImageUpload';
@@ -135,6 +135,17 @@ export function HikesManager() {
     }
   }
 
+  async function handleToggleStatus(h: any) {
+    const newStatus = h.status === 'published' ? 'draft' : 'published';
+    try {
+      await updateHike(h.id, { status: newStatus });
+      setHikes(prev => prev.map(i => i.id === h.id ? { ...i, status: newStatus } : i));
+      showSuccess(newStatus === 'published' ? 'Hike published.' : 'Hike moved to draft.');
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to toggle status.'));
+    }
+  }
+
   const filtered = hikes.filter(h =>
     !search || h.name?.toLowerCase().includes(search.toLowerCase()) || h.location?.toLowerCase().includes(search.toLowerCase())
   );
@@ -180,6 +191,9 @@ export function HikesManager() {
                 <div className="flex gap-2 mt-4">
                   <button onClick={() => openEdit(h)} className="flex-1 px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 flex items-center justify-center gap-1.5">
                     <Pencil className="w-4 h-4" /> Edit
+                  </button>
+                  <button onClick={() => handleToggleStatus(h)} className="px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" title={h.status === 'published' ? 'Move to draft' : 'Publish'}>
+                    {h.status === 'published' ? <Eye className="w-4 h-4 text-emerald-500" /> : <EyeOff className="w-4 h-4 text-gray-400" />}
                   </button>
                   <button onClick={() => setDeleteTarget(h)} className="px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/30 flex items-center justify-center">
                     <Trash2 className="w-4 h-4" />

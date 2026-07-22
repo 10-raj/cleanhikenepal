@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Mail, DollarSign, Calendar, Users, TrendingUp, ArrowUpRight, Mountain,
-  ImageIcon, Handshake, Megaphone, Settings, AlertCircle, Home, Layout, MessageSquare, CheckCircle,
+  ImageIcon, Handshake, Megaphone, AlertCircle, Home, Layout, MessageSquare, CheckCircle,
+  Info, GalleryHorizontalEnd, Sparkle,
 } from 'lucide-react';
 import { getAdminStats } from '../../services/admin';
 import { Link } from 'react-router-dom';
@@ -47,12 +48,15 @@ export function AdminDashboard() {
 
   const cmsCards = [
     { title: 'Homepage Manager', value: 'Banners, Featured', icon: Home, color: 'from-purple-500 to-indigo-600', link: '/admin/homepage', desc: 'Hero carousel & featured content' },
+    { title: 'Banner Manager', value: 'Full CMS', icon: GalleryHorizontalEnd, color: 'from-violet-500 to-purple-600', link: '/admin/banners', desc: 'Manage homepage banners' },
     { title: 'Hikes', value: stats.totalHikes, icon: Mountain, color: 'from-emerald-500 to-green-600', link: '/admin/hikes', desc: 'Manage trek routes' },
     { title: 'Completed Hikes', value: 'CMS', icon: CheckCircle, color: 'from-lime-500 to-green-600', link: '/admin/completed-hikes', desc: 'Manage completed hike records' },
+    { title: 'About Page', value: 'CMS', icon: Info, color: 'from-cyan-500 to-blue-600', link: '/admin/about', desc: 'Founders, mission, vision' },
     { title: 'Gallery', value: stats.totalGallery, icon: ImageIcon, color: 'from-sky-500 to-blue-600', link: '/admin/gallery', desc: 'Manage images' },
     { title: 'Sponsors', value: stats.totalSponsors, icon: Handshake, color: 'from-amber-500 to-orange-600', link: '/admin/sponsors', desc: 'Manage partners' },
     { title: 'Campaigns', value: stats.totalCampaigns, icon: Megaphone, color: 'from-rose-500 to-pink-600', link: '/admin/campaigns', desc: 'Manage events' },
     { title: 'Team', value: stats.totalTeam, icon: Users, color: 'from-teal-500 to-cyan-600', link: '/admin/team', desc: 'Manage members' },
+    { title: 'Logo Manager', value: 'Brand', icon: Sparkle, color: 'from-emerald-500 to-teal-600', link: '/admin/logo', desc: 'Replace site logo' },
   ];
 
   if (loading) {

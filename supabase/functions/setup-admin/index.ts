@@ -20,7 +20,7 @@ const corsHeaders = {
  * Or simply change the password in the Supabase Dashboard → Authentication → Users.
  */
 
-const ADMIN_EMAIL = "admin@cleanhike.com";
+const ADMIN_EMAIL = "acharyaraj2005@gmail.com";
 const ADMIN_PASSWORD = "CleanHike@2026";
 
 Deno.serve(async (req: Request) => {

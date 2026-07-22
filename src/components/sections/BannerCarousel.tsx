@@ -10,11 +10,19 @@ export interface BannerSlide {
   image: string;
   title: string;
   subtitle: string;
+  description?: string;
   button_text: string;
   button_link: string;
   button_visible?: boolean;
+  open_new_tab?: boolean;
   sort_order: number;
   is_active: boolean;
+  status?: 'published' | 'draft';
+  mobile_image?: string;
+  overlay_opacity?: number;
+  text_alignment?: 'left' | 'center' | 'right';
+  start_date?: string | null;
+  end_date?: string | null;
   icon?: 'mountain' | 'camera';
 }
 
@@ -58,10 +66,17 @@ export function BannerCarousel() {
           .from('hero_banners')
           .select('*')
           .eq('is_active', true)
+          .eq('status', 'published')
           .order('sort_order', { ascending: true });
 
         if (!error && data && data.length > 0) {
-          setSlides(data as BannerSlide[]);
+          const now = new Date();
+          const visible = (data as BannerSlide[]).filter(s => {
+            if (s.start_date && new Date(s.start_date) > now) return false;
+            if (s.end_date && new Date(s.end_date) < now) return false;
+            return true;
+          });
+          if (visible.length > 0) setSlides(visible);
         }
       } catch {
         // Use default slides
@@ -152,17 +167,35 @@ export function BannerCarousel() {
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover hidden md:block"
               loading="eager"
             />
+            {slide.mobile_image ? (
+              <img
+                src={slide.mobile_image}
+                alt={slide.title}
+                className="w-full h-full object-cover md:hidden"
+                loading="eager"
+              />
+            ) : (
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full object-cover md:hidden"
+                loading="eager"
+              />
+            )}
             {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/70" />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/10" />
+            <div
+              className="absolute inset-0 bg-black"
+              style={{ opacity: (slide.overlay_opacity ?? 50) / 100 }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/40" />
           </div>
 
           {/* Content */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="max-w-5xl mx-auto px-6 text-center">
+          <div className={`absolute inset-0 flex items-center justify-center ${slide.text_alignment === 'left' ? 'justify-start md:pl-20' : slide.text_alignment === 'right' ? 'justify-end md:pr-20' : ''}`}>
+            <div className={`max-w-5xl mx-auto px-6 ${slide.text_alignment === 'left' ? 'text-left' : slide.text_alignment === 'right' ? 'text-right' : 'text-center'}`}>
               {/* Badge */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -190,11 +223,25 @@ export function BannerCarousel() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-lg md:text-xl text-gray-200 mb-10 max-w-2xl mx-auto leading-relaxed"
+                className="text-lg md:text-xl text-gray-200 mb-4 max-w-2xl mx-auto leading-relaxed"
                 style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}
               >
                 {slide.subtitle}
               </motion.p>
+
+              {/* Description */}
+              {slide.description && (
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.45 }}
+                  className="text-base md:text-lg text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed"
+                  style={{ textShadow: '0 1px 8px rgba(0,0,0,0.5)' }}
+                >
+                  {slide.description}
+                </motion.p>
+              )}
+              {!slide.description && <div className="mb-10" />}
 
               {/* CTA Button */}
               {slide.button_visible !== false && slide.button_text && (
@@ -204,7 +251,13 @@ export function BannerCarousel() {
                   transition={{ delay: 0.5 }}
                 >
                   <button
-                    onClick={() => handleCTAClick(slide.button_link)}
+                    onClick={() => {
+                      if (slide.open_new_tab && /^https?:\/\//i.test(slide.button_link)) {
+                        window.open(slide.button_link, '_blank', 'noopener,noreferrer');
+                      } else {
+                        handleCTAClick(slide.button_link);
+                      }
+                    }}
                     className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold text-lg shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-105 active:scale-95 transition-all duration-300"
                   >
                     {slide.icon === 'camera' ? <Camera className="w-5 h-5" /> : <Mountain className="w-5 h-5" />}

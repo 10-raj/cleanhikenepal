@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Home, Image, Film, BarChart3, Layout } from 'lucide-react';
+import { Home, Image, BarChart3, Layout } from 'lucide-react';
 import { BannerManager } from '../../components/admin/BannerManager';
 import { SettingsManager } from '../../components/admin/SettingsManager';
 
@@ -47,7 +47,8 @@ export function AdminHomepageManagerPage() {
       {/* Tab Content */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
         {activeTab === 'banners' && <BannerManager />}
-        {(activeTab === 'featured' || activeTab === 'settings') && <SettingsManager />}
+        {activeTab === 'featured' && <SettingsManager initialSection="featured" />}
+        {activeTab === 'settings' && <SettingsManager initialSection="settings" />}
       </div>
     </div>
   );

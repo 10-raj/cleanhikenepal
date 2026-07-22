@@ -34,6 +34,9 @@ const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage').t
 const AdminTeamPage = lazy(() => import('./pages/admin/AdminTeamPage').then(m => ({ default: m.AdminTeamPage })));
 const AdminHomepageManagerPage = lazy(() => import('./pages/admin/AdminHomepageManagerPage').then(m => ({ default: m.AdminHomepageManagerPage })));
 const AdminCompletedHikesPage = lazy(() => import('./pages/admin/AdminCompletedHikesPage').then(m => ({ default: m.AdminCompletedHikesPage })));
+const AdminAboutPage = lazy(() => import('./pages/admin/AdminAboutPage').then(m => ({ default: m.AdminAboutPage })));
+const AdminBannersPage = lazy(() => import('./pages/admin/AdminBannersPage').then(m => ({ default: m.AdminBannersPage })));
+const AdminLogoPage = lazy(() => import('./pages/admin/AdminLogoPage').then(m => ({ default: m.AdminLogoPage })));
 
 function RouteLoading() {
   return (
@@ -77,6 +80,9 @@ function App() {
           <Route path="settings" element={<AdminSettingsPage />} />
           <Route path="team" element={<AdminTeamPage />} />
           <Route path="completed-hikes" element={<AdminCompletedHikesPage />} />
+          <Route path="about" element={<AdminAboutPage />} />
+          <Route path="banners" element={<AdminBannersPage />} />
+          <Route path="logo" element={<AdminLogoPage />} />
         </Route>
       </Routes>
       </Suspense>

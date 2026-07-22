@@ -17,7 +17,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const fetchUserProfile = useCallback(async (userId: string, userEmail: string): Promise<User> => {
-    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@cleanhike.com';
+    const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'acharyaraj2005@gmail.com';
     const isAdminEmail = userEmail.toLowerCase() === adminEmail.toLowerCase();
 
     // Fetch the user's role from user_profiles table

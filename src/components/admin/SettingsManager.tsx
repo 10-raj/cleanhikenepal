@@ -41,7 +41,7 @@ interface SettingsRow {
   featured_video_description: string;
 }
 
-export function SettingsManager() {
+export function SettingsManager({ initialSection }: { initialSection?: 'featured' | 'settings' }) {
   const { showSuccess, showError } = useToast();
   const [form, setForm] = useState<Partial<SettingsRow>>({});
   const [loading, setLoading] = useState(true);
@@ -83,10 +83,17 @@ export function SettingsManager() {
   if (loading) return <AdminLoading />;
   if (error) return <AdminError message={error} onRetry={load} />;
 
+  const showFeatured = !initialSection || initialSection === 'featured';
+  const showSettings = !initialSection || initialSection === 'settings';
+
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Website Settings</h1>
-      <p className="text-gray-500 dark:text-gray-400 mb-8">Edit homepage content, statistics, contact info, and next hike details</p>
+      {!initialSection && (
+        <>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Website Settings</h1>
+          <p className="text-gray-500 dark:text-gray-400 mb-8">Edit homepage content, statistics, contact info, and next hike details</p>
+        </>
+      )}
 
       {saved && (
         <div className="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 font-medium">
@@ -96,6 +103,7 @@ export function SettingsManager() {
 
       <div className="space-y-6 max-w-2xl">
         {/* Site Logo */}
+        {showSettings && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-5">
             <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600">
@@ -111,8 +119,10 @@ export function SettingsManager() {
           />
           <p className="text-xs text-gray-400 mt-2">Used in the navbar and footer. Leave empty to keep the default CleanHike Nepal logo.</p>
         </div>
+        )}
 
         {/* Featured Photo */}
+        {showFeatured && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-5">
             <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600">
@@ -127,8 +137,10 @@ export function SettingsManager() {
             <Field label="Learn More Link (optional)"><input className={inputClass} value={form.featured_photo_link || ''} onChange={e => setForm({ ...form, featured_photo_link: e.target.value })} placeholder="/hikes" /></Field>
           </div>
         </div>
+        )}
 
         {/* Featured Video */}
+        {showFeatured && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-5">
             <div className="p-2.5 rounded-xl bg-gradient-to-br from-rose-500 to-red-600">
@@ -142,8 +154,10 @@ export function SettingsManager() {
             <Field label="Description"><textarea rows={2} className={inputClass} value={form.featured_video_description || ''} onChange={e => setForm({ ...form, featured_video_description: e.target.value })} /></Field>
           </div>
         </div>
+        )}
 
         {/* Homepage Statistics */}
+        {showSettings && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-5">
             <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600">
@@ -158,8 +172,10 @@ export function SettingsManager() {
             <Field label="Partner Organizations"><input className={inputClass} value={form.stat_partners || ''} onChange={e => setForm({ ...form, stat_partners: e.target.value })} placeholder="10+" /></Field>
           </div>
         </div>
+        )}
 
         {/* Next Clean Hike */}
+        {showSettings && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-5">
             <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600">
@@ -189,8 +205,10 @@ export function SettingsManager() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Contact Info */}
+        {showSettings && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-5">
             <div className="p-2.5 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600">
@@ -207,6 +225,7 @@ export function SettingsManager() {
             <Field label="Working Hours"><input className={inputClass} value={form.org_hours || ''} onChange={e => setForm({ ...form, org_hours: e.target.value })} /></Field>
           </div>
         </div>
+        )}
 
         <SaveBar onSave={handleSave} onCancel={load} saving={saving} saveLabel="Save Settings" />
       </div>
