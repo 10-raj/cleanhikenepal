@@ -9,10 +9,6 @@ import { useToast, toErrorMessage } from '../../context/ToastContext';
 interface SettingsRow {
   id: string;
   site_logo_url: string;
-  stat_donors: string;
-  stat_raised: string;
-  stat_projects: string;
-  stat_regions: string;
   stat_completed_hikes: string;
   stat_volunteers: string;
   stat_waste_collected: string;
@@ -41,7 +37,9 @@ interface SettingsRow {
   featured_video_description: string;
 }
 
-export function SettingsManager({ initialSection }: { initialSection?: 'featured' | 'settings' }) {
+type SettingsSection = 'featured' | 'homepage-stats' | 'next-hike' | 'contact-info';
+
+export function SettingsManager({ sections }: { sections?: SettingsSection[] }) {
   const { showSuccess, showError } = useToast();
   const [form, setForm] = useState<Partial<SettingsRow>>({});
   const [loading, setLoading] = useState(true);
@@ -83,18 +81,16 @@ export function SettingsManager({ initialSection }: { initialSection?: 'featured
   if (loading) return <AdminLoading />;
   if (error) return <AdminError message={error} onRetry={load} />;
 
-  const showFeatured = !initialSection || initialSection === 'featured';
-  const showSettings = !initialSection || initialSection === 'settings';
+  // Show every section only when no explicit list is passed (defensive default);
+  // callers always pass an explicit list so each admin page shows only its own content.
+  const has = (s: SettingsSection) => !sections || sections.includes(s);
+  const showFeatured = has('featured');
+  const showHomepageStats = has('homepage-stats');
+  const showNextHike = has('next-hike');
+  const showContactInfo = has('contact-info');
 
   return (
     <div>
-      {!initialSection && (
-        <>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Website Settings</h1>
-          <p className="text-gray-500 dark:text-gray-400 mb-8">Edit homepage content, statistics, contact info, and next hike details</p>
-        </>
-      )}
-
       {saved && (
         <div className="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 font-medium">
           Settings saved successfully!
@@ -102,24 +98,6 @@ export function SettingsManager({ initialSection }: { initialSection?: 'featured
       )}
 
       <div className="space-y-6 max-w-2xl">
-        {/* Site Logo */}
-        {showSettings && (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
-          <div className="flex items-center gap-3 mb-5">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600">
-              <Mountain className="w-5 h-5 text-white" />
-            </div>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Site Logo</h2>
-          </div>
-          <ImageUpload
-            label="Logo"
-            folder="branding"
-            value={form.site_logo_url || ''}
-            onChange={url => setForm({ ...form, site_logo_url: url })}
-          />
-          <p className="text-xs text-gray-400 mt-2">Used in the navbar and footer. Leave empty to keep the default CleanHike Nepal logo.</p>
-        </div>
-        )}
 
         {/* Featured Photo */}
         {showFeatured && (
@@ -156,8 +134,7 @@ export function SettingsManager({ initialSection }: { initialSection?: 'featured
         </div>
         )}
 
-        {/* Homepage Statistics */}
-        {showSettings && (
+        {showHomepageStats && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-5">
             <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600">
@@ -174,8 +151,7 @@ export function SettingsManager({ initialSection }: { initialSection?: 'featured
         </div>
         )}
 
-        {/* Next Clean Hike */}
-        {showSettings && (
+        {showNextHike && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-5">
             <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600">
@@ -207,8 +183,7 @@ export function SettingsManager({ initialSection }: { initialSection?: 'featured
         </div>
         )}
 
-        {/* Contact Info */}
-        {showSettings && (
+        {showContactInfo && (
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-5">
             <div className="p-2.5 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600">

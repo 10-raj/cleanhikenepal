@@ -27,14 +27,13 @@ export async function checkIsAdmin(): Promise<boolean> {
 // ============================================================
 
 export async function getAdminStats() {
-  const [messagesResult, donationsResult, bookingsResult, hikesResult, galleryResult, sponsorsResult, campaignsResult, teamResult] = await Promise.all([
+  const [messagesResult, donationsResult, bookingsResult, hikesResult, galleryResult, sponsorsResult, teamResult] = await Promise.all([
     supabase.from('contact_messages').select('id', { count: 'exact', head: true }),
     supabase.from('donations').select('amount', { count: 'exact' }),
     supabase.from('trek_bookings').select('id', { count: 'exact', head: true }),
     supabase.from('hikes').select('id', { count: 'exact', head: true }),
     supabase.from('gallery').select('id', { count: 'exact', head: true }),
     supabase.from('sponsors').select('id', { count: 'exact', head: true }),
-    supabase.from('donation_campaigns').select('id', { count: 'exact', head: true }),
     supabase.from('team_members').select('id', { count: 'exact', head: true }),
   ]);
 
@@ -51,7 +50,6 @@ export async function getAdminStats() {
     totalHikes: hikesResult.count || 0,
     totalGallery: galleryResult.count || 0,
     totalSponsors: sponsorsResult.count || 0,
-    totalCampaigns: campaignsResult.count || 0,
     totalTeam: teamResult.count || 0,
   };
 }
@@ -113,10 +111,7 @@ export async function deleteContactMessage(messageId: string) {
 export async function getAllDonations() {
   const { data, error } = await supabase
     .from('donations')
-    .select(`
-      *,
-      donation_campaigns(title)
-    `)
+    .select('*')
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -316,51 +311,6 @@ export async function deleteSponsor(sponsorId: string) {
     .from('sponsors')
     .delete()
     .eq('id', sponsorId);
-  if (error) throw error;
-}
-
-// ============================================================
-// Donation Campaigns / Events — full CMS CRUD
-// ============================================================
-
-export async function getAllCampaignsAdmin() {
-  const { data, error } = await supabase
-    .from('donation_campaigns')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return data;
-}
-
-export async function createCampaign(campaign: Record<string, any>) {
-  const { data, error } = await supabase
-    .from('donation_campaigns')
-    .insert([campaign])
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
-export async function updateCampaign(campaignId: string, campaign: Record<string, any>) {
-  const { data, error } = await supabase
-    .from('donation_campaigns')
-    .update(campaign)
-    .eq('id', campaignId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
-export async function deleteCampaign(campaignId: string) {
-  const { error } = await supabase
-    .from('donation_campaigns')
-    .delete()
-    .eq('id', campaignId);
   if (error) throw error;
 }
 

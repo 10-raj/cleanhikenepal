@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Image } from 'lucide-react';
-import { galleryData } from '../../data/gallery';
+import { useGallery } from '../../hooks/useGallery';
 import { GalleryImageCard } from '../common/ImageLightbox';
 import { Button } from '../ui/Button';
 import { ScrollReveal } from '../common/ContainerScroll';
@@ -8,7 +8,8 @@ import { useState } from 'react';
 import { ImageLightbox } from '../common/ImageLightbox';
 
 export function GalleryPreviewSection() {
-  const previewImages = galleryData.slice(0, 6);
+  const { images } = useGallery();
+  const previewImages = images.slice(0, 6);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 

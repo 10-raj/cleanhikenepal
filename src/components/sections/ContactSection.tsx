@@ -185,7 +185,7 @@ export function ContactSection() {
   };
 
   return (
-    <section className="pt-24 pb-12 bg-white dark:bg-gray-900 relative overflow-hidden">
+    <section className="pt-20 pb-12 bg-white dark:bg-gray-900 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-sky-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
@@ -194,12 +194,12 @@ export function ContactSection() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <ScrollReveal>
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-sm font-medium mb-4">
               <Mail className="w-4 h-4" />
               Get in Touch
             </span>
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-5">
               Contact{' '}
               <span className="bg-gradient-to-r from-emerald-500 to-green-600 bg-clip-text text-transparent">
                 CleanHike Nepal
@@ -213,7 +213,7 @@ export function ContactSection() {
 
         {/* Contact Info Cards */}
         <ScrollReveal>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {contactInfo.map((info) => {
               const cardClass = "p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:border-emerald-500/50 transition-all text-center group";
               const cardContent = (
@@ -261,7 +261,7 @@ export function ContactSection() {
         </ScrollReveal>
 
         {/* ─── Upcoming Clean Hike Info Card ─── */}
-        <div id="upcoming-hike" ref={upcomingHikeRef} className="mb-16 scroll-mt-24">
+        <div id="upcoming-hike" ref={upcomingHikeRef} className="mb-10 scroll-mt-24">
           <ScrollReveal>
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -354,7 +354,7 @@ export function ContactSection() {
         </div>
 
         {/* ─── Contact Form ─── */}
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid lg:grid-cols-2 gap-10 lg:items-start">
           {/* Purpose Selector + Form */}
           <ScrollReveal>
             <div id="join-us-for-clean-hike" ref={formRef} className="scroll-mt-24">
@@ -604,7 +604,7 @@ export function ContactSection() {
 
           {/* Map & Location */}
           <ScrollReveal>
-            <div className="space-y-6">
+            <div className="space-y-6 lg:sticky lg:top-24">
               <div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Find Us</h3>
                 <p className="text-gray-500 dark:text-gray-400">We're based in Kathmandu, Nepal — come visit us!</p>

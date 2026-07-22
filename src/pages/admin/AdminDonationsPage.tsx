@@ -157,7 +157,6 @@ export function AdminDonationsPage() {
                 <div><p className="text-xs text-gray-500">Payment Method</p><p className="font-medium text-gray-900 dark:text-white capitalize">{viewDonation.payment_method}</p></div>
                 <div><p className="text-xs text-gray-500">Transaction ID</p><p className="font-mono text-sm text-gray-900 dark:text-white">{viewDonation.transaction_id || '—'}</p></div>
                 <div><p className="text-xs text-gray-500">Date</p><p className="font-medium text-gray-900 dark:text-white">{new Date(viewDonation.created_at).toLocaleString()}</p></div>
-                <div><p className="text-xs text-gray-500">Campaign</p><p className="font-medium text-gray-900 dark:text-white">{viewDonation.donation_campaigns?.title || 'General'}</p></div>
               </div>
 
               {viewDonation.remarks && (

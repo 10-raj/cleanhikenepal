@@ -102,7 +102,7 @@ function LinkPicker({ value, onChange }: { value: string; onChange: (link: strin
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Button Links To</label>
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Banner Click Destination</label>
       <select
         className={inputClass}
         value={mode}
@@ -243,16 +243,17 @@ function BannerFormFields({
       </div>
 
       <LinkPicker value={form.button_link} onChange={link => setForm(f => ({ ...f, button_link: link }))} />
+      <p className="text-xs text-gray-400 -mt-2">Clicking anywhere on this banner (not just the button) will take visitors here.</p>
 
       {/* Toggles */}
       <div className="space-y-2 pt-2">
         <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
           <input type="checkbox" checked={form.button_visible} onChange={e => setForm(f => ({ ...f, button_visible: e.target.checked }))} className="rounded" />
-          Show CTA button on this banner
+          Show a CTA button on this banner (optional — the whole banner is clickable either way)
         </label>
         <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
           <input type="checkbox" checked={form.open_new_tab} onChange={e => setForm(f => ({ ...f, open_new_tab: e.target.checked }))} className="rounded" />
-          Open CTA link in a new tab (for external URLs)
+          Open in a new tab (for external URLs)
         </label>
         <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
           <input
@@ -275,7 +276,7 @@ function BannerFormFields({
 
       {/* Preview */}
       {showPreview && (
-        <div className="relative h-48 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+        <div className={`relative h-48 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 ${form.button_link ? 'cursor-pointer' : ''}`}>
           <img src={form.image} alt="preview" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black" style={{ opacity: form.overlay_opacity / 100 }} />
           <div className={`absolute inset-0 flex items-center justify-center px-6 ${form.text_alignment === 'left' ? 'justify-start' : form.text_alignment === 'right' ? 'justify-end' : ''}`}>

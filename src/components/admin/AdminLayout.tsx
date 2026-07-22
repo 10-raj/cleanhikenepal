@@ -6,7 +6,7 @@ import { checkIsAdmin } from '../../services/admin';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard, Mail, DollarSign, Calendar, Settings, Menu, X,
-  Mountain, ImageIcon, Handshake, Megaphone, LogOut, Users, Home, Layout, CheckCircle,
+  Mountain, ImageIcon, Handshake, LogOut, Users, Home, Layout, CheckCircle,
   Info, GalleryHorizontalEnd, Sparkle,
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -20,7 +20,6 @@ const navItems = [
   { name: 'About Page', path: '/admin/about', icon: Info },
   { name: 'Gallery', path: '/admin/gallery', icon: ImageIcon },
   { name: 'Sponsors', path: '/admin/sponsors', icon: Handshake },
-  { name: 'Campaigns', path: '/admin/campaigns', icon: Megaphone },
   { name: 'Donations', path: '/admin/donations', icon: DollarSign },
   { name: 'Messages', path: '/admin/messages', icon: Mail },
   { name: 'Bookings', path: '/admin/bookings', icon: Calendar },
