@@ -105,6 +105,10 @@ export function DonationSuccessForm({ paymentMethod, isOpen, onClose, isBank }: 
       setValidationError('Please enter your name.');
       return;
     }
+    if (!formData.phone.trim()) {
+      setValidationError('Please enter your phone number.');
+      return;
+    }
     if (!formData.remarks.trim()) {
       setValidationError('Please add a remark (e.g. donation purpose).');
       return;
@@ -137,7 +141,7 @@ export function DonationSuccessForm({ paymentMethod, isOpen, onClose, isBank }: 
             body: JSON.stringify({
               name: formData.name,
               email: formData.email || null,
-              phone: formData.phone || null,
+              phone: formData.phone,
               amount: parseFloat(formData.amount),
               payment_method: methodName,
               transaction_id: formData.transactionId || null,
@@ -153,7 +157,7 @@ export function DonationSuccessForm({ paymentMethod, isOpen, onClose, isBank }: 
       await sendDonationEmail({
         name: formData.name,
         email: formData.email || undefined,
-        phone: formData.phone || undefined,
+        phone: formData.phone,
         amount: formData.amount,
         paymentMethod: methodName,
         transactionId: formData.transactionId || undefined,
@@ -237,8 +241,9 @@ export function DonationSuccessForm({ paymentMethod, isOpen, onClose, isBank }: 
                     </div>
                     {/* Phone */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Phone (Optional)</label>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Phone *</label>
                       <input
+                        required
                         value={formData.phone}
                         onChange={e => setFormData(f => ({ ...f, phone: e.target.value }))}
                         placeholder="+977 9XXXXXXXX"

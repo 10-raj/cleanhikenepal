@@ -20,7 +20,8 @@ function toEmbedUrl(url: string): string {
   return `https://maps.google.com/maps?q=${encodeURIComponent(url)}&z=13&output=embed`;
 }
 
-const defaultMapUrl = 'https://maps.google.com/maps?q=Champadevi+Trail+Kathmandu&z=13&output=embed';
+const defaultMapUrl = 'https://maps.google.com/maps?q=Jamacho+Gumba+Kathmandu&z=13&output=embed';
+
 
 export function InteractiveMap() {
   const [embedUrl, setEmbedUrl] = useState(defaultMapUrl);

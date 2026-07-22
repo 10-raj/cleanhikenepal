@@ -70,11 +70,11 @@ function handleEmailClick(e: React.MouseEvent, email: string) {
 
 const defaultNextHike = {
   name: 'Community Clean Hike',
-  location: 'Champadevi Trail, Dakshinkali',
-  date: 'Every Saturday',
+  location: 'Jamcho Gumba Trail, Kathmandu',
+  date: '25th July, Saturday',
   description: 'Join us for our weekly community clean hike. We meet at the trailhead, hike together, and clean up along the way. All are welcome!',
   time: '7:00 AM',
-  meeting_point: 'Pharping Bus Park',
+  meeting_point: 'Jamacho Hike Point',
   difficulty: 'Easy',
   participants: '50 Volunteers',
   registration_link: '',
