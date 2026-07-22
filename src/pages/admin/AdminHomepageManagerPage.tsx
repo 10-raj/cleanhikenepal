@@ -1,18 +1,16 @@
 import { useState } from 'react';
-import { Home, Image, BarChart3, Layout } from 'lucide-react';
-import { BannerManager } from '../../components/admin/BannerManager';
+import { Home, Image, BarChart3 } from 'lucide-react';
 import { SettingsManager } from '../../components/admin/SettingsManager';
 
-type Tab = 'banners' | 'featured' | 'settings';
+type Tab = 'featured' | 'settings';
 
 const tabs = [
-  { id: 'banners' as Tab, label: 'Hero Banner Carousel', icon: Layout, description: 'Manage homepage banner slides' },
   { id: 'featured' as Tab, label: 'Featured Photo & Video', icon: Image, description: 'Manage featured content' },
   { id: 'settings' as Tab, label: 'Statistics & Info', icon: BarChart3, description: 'Manage stats, contact info & next hike' },
 ];
 
 export function AdminHomepageManagerPage() {
-  const [activeTab, setActiveTab] = useState<Tab>('banners');
+  const [activeTab, setActiveTab] = useState<Tab>('featured');
 
   return (
     <div>
@@ -22,7 +20,7 @@ export function AdminHomepageManagerPage() {
         </div>
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Homepage Manager</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Manage all homepage content, banners, featured sections, and statistics</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Manage featured homepage content and statistics. Banners are managed in Banner Manager.</p>
         </div>
       </div>
 
@@ -46,9 +44,8 @@ export function AdminHomepageManagerPage() {
 
       {/* Tab Content */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
-        {activeTab === 'banners' && <BannerManager />}
-        {activeTab === 'featured' && <SettingsManager initialSection="featured" />}
-        {activeTab === 'settings' && <SettingsManager initialSection="settings" />}
+        {activeTab === 'featured' && <SettingsManager sections={['featured']} />}
+        {activeTab === 'settings' && <SettingsManager sections={['homepage-stats', 'next-hike']} />}
       </div>
     </div>
   );

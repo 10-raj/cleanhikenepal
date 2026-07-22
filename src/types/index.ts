@@ -19,18 +19,6 @@ export interface Hike {
   reviewCount: number;
 }
 
-export interface Donation {
-  id: string;
-  title: string;
-  description: string;
-  goalAmount: number;
-  currentAmount: number;
-  category: 'environmental' | 'community' | 'infrastructure' | 'education';
-  image: string;
-  donorsCount: number;
-  endDate?: string;
-}
-
 export interface Sponsor {
   id: string;
   name: string;

@@ -122,6 +122,15 @@ export function BannerCarousel() {
 
   const handleCTAClick = (link: string) => navigateToLink(link, navigate);
 
+  const handleSlideClick = (slide: BannerSlide) => {
+    if (!slide.button_link) return;
+    if (slide.open_new_tab && /^https?:\/\//i.test(slide.button_link)) {
+      window.open(slide.button_link, '_blank', 'noopener,noreferrer');
+    } else {
+      handleCTAClick(slide.button_link);
+    }
+  };
+
   if (slides.length === 0) return null;
 
   const slide = slides[current];
@@ -160,7 +169,10 @@ export function BannerCarousel() {
           initial="enter"
           animate="center"
           exit="exit"
-          className="absolute inset-0"
+          onClick={() => handleSlideClick(slide)}
+          role={slide.button_link ? 'link' : undefined}
+          aria-label={slide.button_link ? `${slide.title} — go to ${slide.button_text || 'linked page'}` : undefined}
+          className={`absolute inset-0 ${slide.button_link ? 'cursor-pointer' : ''}`}
         >
           {/* Background Image */}
           <div className="absolute inset-0">
@@ -257,7 +269,8 @@ export function BannerCarousel() {
                   transition={{ delay: 0.5 }}
                 >
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       if (slide.open_new_tab && /^https?:\/\//i.test(slide.button_link)) {
                         window.open(slide.button_link, '_blank', 'noopener,noreferrer');
                       } else {

@@ -29,7 +29,6 @@ const AdminBookingsPage = lazy(() => import('./pages/admin/AdminBookingsPage').t
 const AdminHikesPage = lazy(() => import('./pages/admin/AdminHikesPage').then(m => ({ default: m.AdminHikesPage })));
 const AdminGalleryPage = lazy(() => import('./pages/admin/AdminGalleryPage').then(m => ({ default: m.AdminGalleryPage })));
 const AdminSponsorsPage = lazy(() => import('./pages/admin/AdminSponsorsPage').then(m => ({ default: m.AdminSponsorsPage })));
-const AdminCampaignsPage = lazy(() => import('./pages/admin/AdminCampaignsPage').then(m => ({ default: m.AdminCampaignsPage })));
 const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage').then(m => ({ default: m.AdminSettingsPage })));
 const AdminTeamPage = lazy(() => import('./pages/admin/AdminTeamPage').then(m => ({ default: m.AdminTeamPage })));
 const AdminHomepageManagerPage = lazy(() => import('./pages/admin/AdminHomepageManagerPage').then(m => ({ default: m.AdminHomepageManagerPage })));
@@ -73,7 +72,6 @@ function App() {
           <Route path="hikes" element={<AdminHikesPage />} />
           <Route path="gallery" element={<AdminGalleryPage />} />
           <Route path="sponsors" element={<AdminSponsorsPage />} />
-          <Route path="campaigns" element={<AdminCampaignsPage />} />
           <Route path="donations" element={<AdminDonationsPage />} />
           <Route path="messages" element={<AdminMessagesPage />} />
           <Route path="bookings" element={<AdminBookingsPage />} />

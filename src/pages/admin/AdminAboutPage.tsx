@@ -8,7 +8,7 @@ import { ImageUpload } from '../../components/admin/ImageUpload';
 import { AdminLoading, AdminEmpty, inputClass, Field } from '../../components/admin/AdminUI';
 import { useToast, toErrorMessage } from '../../context/ToastContext';
 
-type AboutSection = 'founders' | 'history' | 'mission' | 'vision' | 'values' | 'story';
+type AboutSection = 'founders' | 'history' | 'mission' | 'vision';
 type ContentStatus = 'published' | 'draft';
 
 interface AboutItem {
@@ -29,8 +29,6 @@ const sectionLabels: Record<AboutSection, string> = {
   history: 'History',
   mission: 'Mission',
   vision: 'Vision',
-  values: 'Values',
-  story: 'Story',
 };
 
 const defaultForm = {

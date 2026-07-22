@@ -222,7 +222,7 @@ export function HikesManager() {
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             <Field label="Max Elevation (m)"><input type="number" className={inputClass} value={form.max_elevation || 0} onChange={e => setForm({ ...form, max_elevation: Number(e.target.value) })} /></Field>
-            <Field label="Price (Rs.)"><input type="number" className={inputClass} value={form.price || 0} onChange={e => setForm({ ...form, price: Number(e.target.value) })} /></Field>
+            <Field label="Price ($)"><input type="number" className={inputClass} value={form.price || 0} onChange={e => setForm({ ...form, price: Number(e.target.value) })} /></Field>
             <Field label="Rating"><input type="number" step="0.1" className={inputClass} value={form.rating || 4.5} onChange={e => setForm({ ...form, rating: Number(e.target.value) })} /></Field>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
