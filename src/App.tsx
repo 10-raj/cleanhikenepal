@@ -1,38 +1,53 @@
+import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ScrollToTop } from './components/ScrollToTop';
 
 import { MainLayout } from './components/layout/MainLayout';
 import { AdminLayout } from './components/admin/AdminLayout';
 
+// Home is kept eager since it's the most common entry point and we
+// want the fastest possible first paint there. Everything else is
+// code-split so a visitor never downloads admin (or other-page) JS
+// they don't need.
 import { HomePage } from './pages/HomePage';
-import { HikesPage } from './pages/HikesPage';
-import { HikeDetailPage } from './pages/HikeDetailPage';
-import { AboutPage } from './pages/AboutPage';
-import { GalleryPage } from './pages/GalleryPage';
-import { ContactPage } from './pages/ContactPage';
-import { DonatePage } from './pages/DonatePage';
-import { SponsorsPage } from './pages/SponsorsPage';
-import { PrivacyPage } from './pages/PrivacyPage';
-import { TermsPage } from './pages/TermsPage';
 
-import { AdminLoginPage } from './pages/admin/AdminLoginPage';
-import { AdminDashboardPage } from './pages/admin/AdminDashboardPage';
-import { AdminMessagesPage } from './pages/admin/AdminMessagesPage';
-import { AdminDonationsPage } from './pages/admin/AdminDonationsPage';
-import { AdminBookingsPage } from './pages/admin/AdminBookingsPage';
-import { AdminHikesPage } from './pages/admin/AdminHikesPage';
-import { AdminGalleryPage } from './pages/admin/AdminGalleryPage';
-import { AdminSponsorsPage } from './pages/admin/AdminSponsorsPage';
-import { AdminCampaignsPage } from './pages/admin/AdminCampaignsPage';
-import { AdminSettingsPage } from './pages/admin/AdminSettingsPage';
-import { AdminTeamPage } from './pages/admin/AdminTeamPage';
-import { AdminHomepageManagerPage } from './pages/admin/AdminHomepageManagerPage';
-import { AdminCompletedHikesPage } from './pages/admin/AdminCompletedHikesPage';
+const HikesPage = lazy(() => import('./pages/HikesPage').then(m => ({ default: m.HikesPage })));
+const HikeDetailPage = lazy(() => import('./pages/HikeDetailPage').then(m => ({ default: m.HikeDetailPage })));
+const AboutPage = lazy(() => import('./pages/AboutPage').then(m => ({ default: m.AboutPage })));
+const GalleryPage = lazy(() => import('./pages/GalleryPage').then(m => ({ default: m.GalleryPage })));
+const ContactPage = lazy(() => import('./pages/ContactPage').then(m => ({ default: m.ContactPage })));
+const DonatePage = lazy(() => import('./pages/DonatePage').then(m => ({ default: m.DonatePage })));
+const SponsorsPage = lazy(() => import('./pages/SponsorsPage').then(m => ({ default: m.SponsorsPage })));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
+const TermsPage = lazy(() => import('./pages/TermsPage').then(m => ({ default: m.TermsPage })));
+
+const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage').then(m => ({ default: m.AdminLoginPage })));
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })));
+const AdminMessagesPage = lazy(() => import('./pages/admin/AdminMessagesPage').then(m => ({ default: m.AdminMessagesPage })));
+const AdminDonationsPage = lazy(() => import('./pages/admin/AdminDonationsPage').then(m => ({ default: m.AdminDonationsPage })));
+const AdminBookingsPage = lazy(() => import('./pages/admin/AdminBookingsPage').then(m => ({ default: m.AdminBookingsPage })));
+const AdminHikesPage = lazy(() => import('./pages/admin/AdminHikesPage').then(m => ({ default: m.AdminHikesPage })));
+const AdminGalleryPage = lazy(() => import('./pages/admin/AdminGalleryPage').then(m => ({ default: m.AdminGalleryPage })));
+const AdminSponsorsPage = lazy(() => import('./pages/admin/AdminSponsorsPage').then(m => ({ default: m.AdminSponsorsPage })));
+const AdminCampaignsPage = lazy(() => import('./pages/admin/AdminCampaignsPage').then(m => ({ default: m.AdminCampaignsPage })));
+const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage').then(m => ({ default: m.AdminSettingsPage })));
+const AdminTeamPage = lazy(() => import('./pages/admin/AdminTeamPage').then(m => ({ default: m.AdminTeamPage })));
+const AdminHomepageManagerPage = lazy(() => import('./pages/admin/AdminHomepageManagerPage').then(m => ({ default: m.AdminHomepageManagerPage })));
+const AdminCompletedHikesPage = lazy(() => import('./pages/admin/AdminCompletedHikesPage').then(m => ({ default: m.AdminCompletedHikesPage })));
+
+function RouteLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-500" />
+    </div>
+  );
+}
 
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <Suspense fallback={<RouteLoading />}>
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
@@ -64,6 +79,7 @@ function App() {
           <Route path="completed-hikes" element={<AdminCompletedHikesPage />} />
         </Route>
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }
