@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { DollarSign, Search, CheckCircle, Clock, XCircle, TrendingUp, Eye, Trash2, ImageIcon, ShieldCheck, XCircle as RejectIcon } from 'lucide-react';
 import { getAllDonations, verifyDonation, deleteDonation } from '../../services/admin';
 import { AdminLoading, AdminError, AdminEmpty, ConfirmDialog, AdminModal } from '../../components/admin/AdminUI';
+import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 export function AdminDonationsPage() {
+  const { showSuccess, showError } = useToast();
   const [donations, setDonations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,14 +28,15 @@ export function AdminDonationsPage() {
       await verifyDonation(id, status);
       setDonations(donations.map(d => d.id === id ? { ...d, verification_status: status } : d));
       if (viewDonation?.id === id) setViewDonation({ ...viewDonation, verification_status: status });
-    } catch (e) { console.error(e); alert('Failed to update verification.'); }
+      showSuccess(`Donation marked as ${status}.`);
+    } catch (e) { console.error(e); showError(toErrorMessage(e, 'Failed to update verification.')); }
   }
 
   async function handleDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
-    try { await deleteDonation(deleteTarget.id); setDeleteTarget(null); await load(); }
-    catch (e) { console.error(e); alert('Failed to delete donation.'); }
+    try { await deleteDonation(deleteTarget.id); setDeleteTarget(null); showSuccess('Donation deleted.'); await load(); }
+    catch (e) { console.error(e); showError(toErrorMessage(e, 'Failed to delete donation.')); }
     finally { setDeleting(false); }
   }
 

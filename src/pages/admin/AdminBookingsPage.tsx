@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Search, CheckCircle, Clock, XCircle, Mountain, Users } from 'lucide-react';
 import { getAllBookings, updateBookingStatus } from '../../services/admin';
+import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 export function AdminBookingsPage() {
+  const { showSuccess, showError } = useToast();
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -28,8 +30,10 @@ export function AdminBookingsPage() {
     try {
       await updateBookingStatus(bookingId, status);
       setBookings(bookings.map(b => b.id === bookingId ? { ...b, status } : b));
+      showSuccess(`Booking marked as ${status}.`);
     } catch (error) {
       console.error('Failed to update booking:', error);
+      showError(toErrorMessage(error, 'Failed to update booking status.'));
     }
   };
 

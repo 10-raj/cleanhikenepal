@@ -4,6 +4,7 @@ import { Mountain, Plus, Pencil, Trash2, Search, Star } from 'lucide-react';
 import { getAllHikesAdmin, createHike, updateHike, deleteHike } from '../../services/admin';
 import { AdminLoading, AdminEmpty, AdminError, ConfirmDialog, AdminModal, Field, inputClass, SaveBar } from './AdminUI';
 import { ImageUpload } from './ImageUpload';
+import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 interface HikeRow {
   id: string;
@@ -43,6 +44,7 @@ function slugify(s: string) {
 }
 
 export function HikesManager() {
+  const { showSuccess, showError } = useToast();
   const [hikes, setHikes] = useState<HikeRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -107,10 +109,11 @@ export function HikesManager() {
         await createHike(payload);
       }
       setModalOpen(false);
+      showSuccess(editing ? 'Hike updated successfully.' : 'Hike created successfully.');
       await load();
     } catch (e) {
       console.error(e);
-      alert('Failed to save hike. Check console for details.');
+      showError(toErrorMessage(e, 'Failed to save hike.'));
     } finally {
       setSaving(false);
     }
@@ -122,10 +125,11 @@ export function HikesManager() {
     try {
       await deleteHike(deleteTarget.id);
       setDeleteTarget(null);
+      showSuccess('Hike deleted.');
       await load();
     } catch (e) {
       console.error(e);
-      alert('Failed to delete hike.');
+      showError(toErrorMessage(e, 'Failed to delete hike.'));
     } finally {
       setDeleting(false);
     }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Search, CheckCircle, Clock, Archive, Send, AlertCircle } from 'lucide-react';
 import { getAllContactMessages, updateMessageStatus, replyToMessage } from '../../services/admin';
+import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 interface ContactMessage {
   id: string;
@@ -30,6 +31,7 @@ const statusIcons = {
 };
 
 export function MessagesPage() {
+  const { showSuccess, showError } = useToast();
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
@@ -63,6 +65,7 @@ export function MessagesPage() {
       }
     } catch (error) {
       console.error('Failed to update status:', error);
+      showError(toErrorMessage(error, 'Failed to update message status.'));
     }
   };
 
@@ -85,8 +88,10 @@ export function MessagesPage() {
         replied_at: new Date().toISOString(),
       });
       setReplyText('');
+      showSuccess('Reply sent successfully.');
     } catch (error) {
       console.error('Failed to send reply:', error);
+      showError(toErrorMessage(error, 'Failed to send reply.'));
     } finally {
       setSending(false);
     }

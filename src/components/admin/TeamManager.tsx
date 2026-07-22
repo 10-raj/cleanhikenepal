@@ -4,6 +4,7 @@ import { Users, Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { getAllTeamMembers, createTeamMember, updateTeamMember, deleteTeamMember } from '../../services/admin';
 import { AdminLoading, AdminEmpty, AdminError, ConfirmDialog, AdminModal, Field, inputClass, SaveBar } from './AdminUI';
 import { ImageUpload } from './ImageUpload';
+import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 interface TeamMemberRow {
   id: string;
@@ -21,6 +22,7 @@ const emptyForm: Partial<TeamMemberRow> = {
 };
 
 export function TeamManager() {
+  const { showSuccess, showError } = useToast();
   const [items, setItems] = useState<TeamMemberRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +46,7 @@ export function TeamManager() {
   function openEdit(m: TeamMemberRow) { setEditing(m); setForm({ ...m, social_links: m.social_links || {} }); setModalOpen(true); }
 
   async function handleSave() {
-    if (!form.name || !form.role) { alert('Name and designation are required.'); return; }
+    if (!form.name || !form.role) { showError('Name and designation are required.'); return; }
     setSaving(true);
     try {
       const payload = {
@@ -57,16 +59,16 @@ export function TeamManager() {
         is_active: form.is_active !== false,
       };
       if (editing) await updateTeamMember(editing.id, payload); else await createTeamMember(payload);
-      setModalOpen(false); await load();
-    } catch (e) { console.error(e); alert('Failed to save team member.'); }
+      setModalOpen(false); showSuccess(editing ? 'Team member updated successfully.' : 'Team member added successfully.'); await load();
+    } catch (e) { console.error(e); showError(toErrorMessage(e, 'Failed to save team member.')); }
     finally { setSaving(false); }
   }
 
   async function handleDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
-    try { await deleteTeamMember(deleteTarget.id); setDeleteTarget(null); await load(); }
-    catch (e) { console.error(e); alert('Failed to delete team member.'); }
+    try { await deleteTeamMember(deleteTarget.id); setDeleteTarget(null); showSuccess('Team member deleted.'); await load(); }
+    catch (e) { console.error(e); showError(toErrorMessage(e, 'Failed to delete team member.')); }
     finally { setDeleting(false); }
   }
 

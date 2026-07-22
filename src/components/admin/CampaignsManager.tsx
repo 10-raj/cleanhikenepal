@@ -4,6 +4,7 @@ import { Megaphone, Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { getAllCampaignsAdmin, createCampaign, updateCampaign, deleteCampaign } from '../../services/admin';
 import { AdminLoading, AdminEmpty, AdminError, ConfirmDialog, AdminModal, Field, inputClass, SaveBar } from './AdminUI';
 import { ImageUpload } from './ImageUpload';
+import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 interface CampaignRow {
   id: string;
@@ -26,6 +27,7 @@ const emptyForm: Partial<CampaignRow> = { title: '', slug: '', description: '', 
 function slugify(s: string) { return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
 
 export function CampaignsManager() {
+  const { showSuccess, showError } = useToast();
   const [items, setItems] = useState<CampaignRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +51,7 @@ export function CampaignsManager() {
   function openEdit(c: CampaignRow) { setEditing(c); setForm({ ...c, end_date: c.end_date ? c.end_date.split('T')[0] : '' }); setModalOpen(true); }
 
   async function handleSave() {
-    if (!form.title || !form.description) { alert('Title and description are required.'); return; }
+    if (!form.title || !form.description) { showError('Title and description are required.'); return; }
     setSaving(true);
     try {
       const payload = {
@@ -62,16 +64,16 @@ export function CampaignsManager() {
         image: form.image || 'https://images.pexels.com/photos/1680247/pexels-photo-1680247.jpeg?auto=compress&cs=tinysrgb&w=1200',
       };
       if (editing) await updateCampaign(editing.id, payload); else await createCampaign(payload);
-      setModalOpen(false); await load();
-    } catch (e) { console.error(e); alert('Failed to save campaign.'); }
+      setModalOpen(false); showSuccess(editing ? 'Campaign updated successfully.' : 'Campaign created successfully.'); await load();
+    } catch (e) { console.error(e); showError(toErrorMessage(e, 'Failed to save campaign.')); }
     finally { setSaving(false); }
   }
 
   async function handleDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
-    try { await deleteCampaign(deleteTarget.id); setDeleteTarget(null); await load(); }
-    catch (e) { console.error(e); alert('Failed to delete campaign.'); }
+    try { await deleteCampaign(deleteTarget.id); setDeleteTarget(null); showSuccess('Campaign deleted.'); await load(); }
+    catch (e) { console.error(e); showError(toErrorMessage(e, 'Failed to delete campaign.')); }
     finally { setDeleting(false); }
   }
 
@@ -132,8 +134,14 @@ export function CampaignsManager() {
                         type="button"
                         onClick={async () => {
                           const newStatus = c.status === 'active' ? 'draft' : 'active';
-                          await updateCampaign(c.id, { status: newStatus });
-                          await load();
+                          try {
+                            await updateCampaign(c.id, { status: newStatus });
+                            showSuccess(newStatus === 'active' ? 'Campaign published.' : 'Campaign moved to draft.');
+                            await load();
+                          } catch (e) {
+                            console.error(e);
+                            showError(toErrorMessage(e, 'Failed to update campaign status.'));
+                          }
                         }}
                         className={'px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ' + (c.status === 'active' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600')}
                       >

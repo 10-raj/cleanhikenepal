@@ -17,6 +17,7 @@ import {
   inputClass,
   SaveBar,
 } from './AdminUI';
+import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 interface CompletedHikeRow {
   id: string;
@@ -50,6 +51,7 @@ const emptyForm: Partial<CompletedHikeRow> = {
 };
 
 export function CompletedHikesManager() {
+  const { showSuccess, showError } = useToast();
   const [items, setItems] = useState<CompletedHikeRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -96,7 +98,7 @@ export function CompletedHikesManager() {
 
   async function handleSave() {
     if (!form.name || !form.location || !form.completed_date) {
-      alert('Name, location, and completed date are required.');
+      showError('Name, location, and completed date are required.');
       return;
     }
     setSaving(true);
@@ -116,10 +118,11 @@ export function CompletedHikesManager() {
         await createCompletedHike(payload);
       }
       setModalOpen(false);
+      showSuccess(editing ? 'Completed hike updated successfully.' : 'Completed hike added successfully.');
       await load();
     } catch (e) {
       console.error(e);
-      alert('Failed to save completed hike.');
+      showError(toErrorMessage(e, 'Failed to save completed hike.'));
     } finally {
       setSaving(false);
     }
@@ -131,10 +134,11 @@ export function CompletedHikesManager() {
     try {
       await deleteCompletedHike(deleteTarget.id);
       setDeleteTarget(null);
+      showSuccess('Completed hike deleted.');
       await load();
     } catch (e) {
       console.error(e);
-      alert('Failed to delete completed hike.');
+      showError(toErrorMessage(e, 'Failed to delete completed hike.'));
     } finally {
       setDeleting(false);
     }

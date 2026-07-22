@@ -6,6 +6,7 @@ import { BannerSlide } from '../sections/BannerCarousel';
 import { ImageUpload } from './ImageUpload';
 import { AdminLoading, AdminError, inputClass } from './AdminUI';
 import { CMS_LINK_OPTIONS } from '../../utils/navigateToLink';
+import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 const defaultBanner: Omit<BannerSlide, 'id'> = {
   image: '',
@@ -63,6 +64,7 @@ function LinkPicker({
 }
 
 export function BannerManager() {
+  const { showSuccess, showError } = useToast();
   const [banners, setBanners] = useState<BannerSlide[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -102,7 +104,7 @@ export function BannerManager() {
         sort_order: banners.length + 1,
       };
       if (!bannerData.title || !bannerData.image) {
-        alert('Please fill in the title and image.');
+        showError('Please fill in the title and image.');
         return;
       }
       const { error: err } = await supabase.from('hero_banners').insert([bannerData]);
@@ -110,9 +112,10 @@ export function BannerManager() {
       setNewBanner({ ...defaultBanner });
       setImageUrl('');
       setShowAddForm(false);
+      showSuccess('Banner added successfully.');
       await loadBanners();
-    } catch (e: any) {
-      alert('Failed to add banner: ' + e.message);
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to add banner.'));
     } finally {
       setSaving(false);
     }
@@ -124,8 +127,9 @@ export function BannerManager() {
       const { error: err } = await supabase.from('hero_banners').update(updates).eq('id', id);
       if (err) throw err;
       setBanners(prev => prev.map(b => b.id === id ? { ...b, ...updates } : b));
-    } catch (e: any) {
-      alert('Failed to update banner: ' + e.message);
+      showSuccess('Banner updated successfully.');
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to update banner.'));
     } finally {
       setSaving(false);
       setEditingId(null);
@@ -138,8 +142,9 @@ export function BannerManager() {
       const { error: err } = await supabase.from('hero_banners').delete().eq('id', id);
       if (err) throw err;
       setBanners(prev => prev.filter(b => b.id !== id));
-    } catch (e: any) {
-      alert('Failed to delete: ' + e.message);
+      showSuccess('Banner deleted.');
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to delete banner.'));
     }
   }
 

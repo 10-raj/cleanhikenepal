@@ -4,6 +4,7 @@ import { ImageIcon, Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { getAllGalleryAdmin, createGalleryImage, updateGalleryImage, deleteGalleryImage } from '../../services/admin';
 import { AdminLoading, AdminEmpty, AdminError, ConfirmDialog, AdminModal, Field, inputClass, SaveBar } from './AdminUI';
 import { ImageUpload } from './ImageUpload';
+import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 interface GalleryRow {
   id: string;
@@ -19,6 +20,7 @@ interface GalleryRow {
 const emptyForm: Partial<GalleryRow> = { title: '', src: '', alt: '', category: 'nature', location: '', display_order: 0, is_active: true };
 
 export function GalleryManager() {
+  const { showSuccess, showError } = useToast();
   const [items, setItems] = useState<GalleryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,21 +44,21 @@ export function GalleryManager() {
   function openEdit(g: GalleryRow) { setEditing(g); setForm(g); setModalOpen(true); }
 
   async function handleSave() {
-    if (!form.src) { alert('Image URL is required.'); return; }
+    if (!form.src) { showError('Image URL is required.'); return; }
     setSaving(true);
     try {
       const payload = { ...form, display_order: Number(form.display_order) || 0, alt: form.alt || form.title || 'Gallery image' };
       if (editing) await updateGalleryImage(editing.id, payload); else await createGalleryImage(payload);
-      setModalOpen(false); await load();
-    } catch (e) { console.error(e); alert('Failed to save image.'); }
+      setModalOpen(false); showSuccess(editing ? 'Image updated successfully.' : 'Image added successfully.'); await load();
+    } catch (e) { console.error(e); showError(toErrorMessage(e, 'Failed to save image.')); }
     finally { setSaving(false); }
   }
 
   async function handleDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
-    try { await deleteGalleryImage(deleteTarget.id); setDeleteTarget(null); await load(); }
-    catch (e) { console.error(e); alert('Failed to delete image.'); }
+    try { await deleteGalleryImage(deleteTarget.id); setDeleteTarget(null); showSuccess('Image deleted.'); await load(); }
+    catch (e) { console.error(e); showError(toErrorMessage(e, 'Failed to delete image.')); }
     finally { setDeleting(false); }
   }
 

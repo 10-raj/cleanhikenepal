@@ -1,5 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { ToastProvider } from '../../context/ToastContext';
 import { useState, useEffect } from 'react';
 import { checkIsAdmin } from '../../services/admin';
 import { motion } from 'framer-motion';
@@ -70,6 +71,7 @@ export function AdminLayout() {
   }
 
   return (
+    <ToastProvider>
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
       {/* Sidebar */}
       <motion.aside
@@ -148,5 +150,6 @@ export function AdminLayout() {
         </div>
       </main>
     </div>
+    </ToastProvider>
   );
 }

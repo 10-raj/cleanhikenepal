@@ -4,6 +4,7 @@ import { Handshake, Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { getAllSponsorsAdmin, createSponsor, updateSponsor, deleteSponsor } from '../../services/admin';
 import { AdminLoading, AdminEmpty, AdminError, ConfirmDialog, AdminModal, Field, inputClass, SaveBar } from './AdminUI';
 import { ImageUpload } from './ImageUpload';
+import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 interface SponsorRow {
   id: string;
@@ -19,6 +20,7 @@ interface SponsorRow {
 const emptyForm: Partial<SponsorRow> = { name: '', logo: '', website: '', tier: 'silver', description: '', display_order: 0, is_active: true };
 
 export function SponsorsManager() {
+  const { showSuccess, showError } = useToast();
   const [items, setItems] = useState<SponsorRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,21 +44,21 @@ export function SponsorsManager() {
   function openEdit(s: SponsorRow) { setEditing(s); setForm(s); setModalOpen(true); }
 
   async function handleSave() {
-    if (!form.name) { alert('Sponsor name is required.'); return; }
+    if (!form.name) { showError('Sponsor name is required.'); return; }
     setSaving(true);
     try {
       const payload = { ...form, display_order: Number(form.display_order) || 0 };
       if (editing) await updateSponsor(editing.id, payload); else await createSponsor(payload);
-      setModalOpen(false); await load();
-    } catch (e) { console.error(e); alert('Failed to save sponsor.'); }
+      setModalOpen(false); showSuccess(editing ? 'Sponsor updated successfully.' : 'Sponsor added successfully.'); await load();
+    } catch (e) { console.error(e); showError(toErrorMessage(e, 'Failed to save sponsor.')); }
     finally { setSaving(false); }
   }
 
   async function handleDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
-    try { await deleteSponsor(deleteTarget.id); setDeleteTarget(null); await load(); }
-    catch (e) { console.error(e); alert('Failed to delete sponsor.'); }
+    try { await deleteSponsor(deleteTarget.id); setDeleteTarget(null); showSuccess('Sponsor deleted.'); await load(); }
+    catch (e) { console.error(e); showError(toErrorMessage(e, 'Failed to delete sponsor.')); }
     finally { setDeleting(false); }
   }
 

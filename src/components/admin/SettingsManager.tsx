@@ -4,6 +4,7 @@ import { getWebsiteSettings, updateWebsiteSettings } from '../../services/admin'
 import { AdminLoading, AdminError, Field, inputClass, SaveBar } from './AdminUI';
 import { ImageUpload } from './ImageUpload';
 import { VideoUpload } from './VideoUpload';
+import { useToast, toErrorMessage } from '../../context/ToastContext';
 
 interface SettingsRow {
   id: string;
@@ -41,6 +42,7 @@ interface SettingsRow {
 }
 
 export function SettingsManager() {
+  const { showSuccess, showError } = useToast();
   const [form, setForm] = useState<Partial<SettingsRow>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -68,10 +70,11 @@ export function SettingsManager() {
       const { id, ...payload } = form;
       await updateWebsiteSettings(payload);
       setSaved(true);
+      showSuccess('Settings saved successfully.');
       setTimeout(() => setSaved(false), 3000);
     } catch (e) {
       console.error(e);
-      alert('Failed to save settings.');
+      showError(toErrorMessage(e, 'Failed to save settings.'));
     } finally {
       setSaving(false);
     }
