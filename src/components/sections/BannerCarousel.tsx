@@ -156,7 +156,7 @@ export function BannerCarousel() {
     <>
     <div
       className="relative w-full overflow-hidden"
-      style={{ height: 'clamp(420px, 70vh, 720px)' }}
+      style={{ height: 'clamp(600px, 90vh, 900px)' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -209,16 +209,22 @@ export function BannerCarousel() {
           <div className={`absolute inset-0 flex items-center justify-center ${slide.text_alignment === 'left' ? 'justify-start md:pl-20' : slide.text_alignment === 'right' ? 'justify-end md:pr-20' : ''}`}>
             <div className={`max-w-5xl mx-auto px-6 ${slide.text_alignment === 'left' ? 'text-left' : slide.text_alignment === 'right' ? 'text-right' : 'text-center'}`}>
               {/* Badge */}
+              {/*
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 backdrop-blur-md border border-emerald-400/30 text-emerald-300 text-sm font-medium mb-6"
               >
-                {slide.icon === 'camera' ? <Camera className="w-4 h-4" /> : <Mountain className="w-4 h-4" />}
+                
+              {slide.icon === 'camera' ? <Camera className="w-4 h-4" /> : <Mountain className="w-4 h-4" />}
                 CleanHike Nepal
-              </motion.div>
+                
 
+              </motion.div> 
+              */}
+
+              
               {/* Title */}
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
