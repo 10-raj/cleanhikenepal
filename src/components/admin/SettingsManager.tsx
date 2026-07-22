@@ -7,6 +7,7 @@ import { VideoUpload } from './VideoUpload';
 
 interface SettingsRow {
   id: string;
+  site_logo_url: string;
   stat_donors: string;
   stat_raised: string;
   stat_projects: string;
@@ -91,6 +92,23 @@ export function SettingsManager() {
       )}
 
       <div className="space-y-6 max-w-2xl">
+        {/* Site Logo */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600">
+              <Mountain className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Site Logo</h2>
+          </div>
+          <ImageUpload
+            label="Logo"
+            folder="branding"
+            value={form.site_logo_url || ''}
+            onChange={url => setForm({ ...form, site_logo_url: url })}
+          />
+          <p className="text-xs text-gray-400 mt-2">Used in the navbar and footer. Leave empty to keep the default CleanHike Nepal logo.</p>
+        </div>
+
         {/* Featured Photo */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex items-center gap-3 mb-5">

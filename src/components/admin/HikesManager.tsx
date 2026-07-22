@@ -22,12 +22,20 @@ interface HikeRow {
   rating: number;
   highlights: string[];
   best_season: string[];
+  hike_date: string | null;
+  video: string;
+  route_url: string;
+  map_url: string;
+  available_seats: number | null;
+  status: 'published' | 'draft';
 }
 
 const emptyForm: Partial<HikeRow> = {
   name: '', slug: '', location: '', region: '', difficulty: 'Moderate',
   duration: '', distance: '', max_elevation: 0, description: '', image: '',
   featured: false, price: 0, rating: 4.5, highlights: [], best_season: [],
+  hike_date: null, video: '', route_url: '', map_url: '', available_seats: null,
+  status: 'published',
 };
 
 function slugify(s: string) {
@@ -156,6 +164,7 @@ export function HikesManager() {
               <div className="relative h-40 overflow-hidden">
                 {h.image ? <img src={h.image} alt={h.name} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gray-200 dark:bg-gray-700" />}
                 {h.featured && <span className="absolute top-3 left-3 px-2 py-1 rounded-full bg-amber-400 text-amber-900 text-xs font-semibold flex items-center gap-1"><Star className="w-3 h-3" /> Featured</span>}
+                {h.status === 'draft' && <span className="absolute top-3 right-3 px-2 py-1 rounded-full bg-gray-700 text-white text-xs font-semibold">Draft</span>}
               </div>
               <div className="p-4">
                 <h3 className="font-bold text-gray-900 dark:text-white">{h.name}</h3>
@@ -197,6 +206,21 @@ export function HikesManager() {
             <Field label="Max Elevation (m)"><input type="number" className={inputClass} value={form.max_elevation || 0} onChange={e => setForm({ ...form, max_elevation: Number(e.target.value) })} /></Field>
             <Field label="Price (Rs.)"><input type="number" className={inputClass} value={form.price || 0} onChange={e => setForm({ ...form, price: Number(e.target.value) })} /></Field>
             <Field label="Rating"><input type="number" step="0.1" className={inputClass} value={form.rating || 4.5} onChange={e => setForm({ ...form, rating: Number(e.target.value) })} /></Field>
+          </div>
+          <div className="grid md:grid-cols-3 gap-4">
+            <Field label="Date"><input type="date" className={inputClass} value={form.hike_date || ''} onChange={e => setForm({ ...form, hike_date: e.target.value || null })} /></Field>
+            <Field label="Available Seats"><input type="number" className={inputClass} value={form.available_seats ?? ''} onChange={e => setForm({ ...form, available_seats: e.target.value === '' ? null : Number(e.target.value) })} placeholder="Leave blank for unlimited" /></Field>
+            <Field label="Status">
+              <select className={inputClass} value={form.status || 'published'} onChange={e => setForm({ ...form, status: e.target.value as 'published' | 'draft' })}>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+              </select>
+            </Field>
+          </div>
+          <div className="grid md:grid-cols-3 gap-4">
+            <Field label="Video URL"><input className={inputClass} value={form.video || ''} onChange={e => setForm({ ...form, video: e.target.value })} placeholder="https://..." /></Field>
+            <Field label="Route URL"><input className={inputClass} value={form.route_url || ''} onChange={e => setForm({ ...form, route_url: e.target.value })} placeholder="GPX / route link" /></Field>
+            <Field label="Map URL"><input className={inputClass} value={form.map_url || ''} onChange={e => setForm({ ...form, map_url: e.target.value })} placeholder="Google Maps link" /></Field>
           </div>
           <ImageUpload label="Hike Image" folder="hikes" value={form.image || ''} onChange={url => setForm({ ...form, image: url })} />
           <Field label="Description"><textarea rows={3} className={inputClass} value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} /></Field>

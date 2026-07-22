@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Sun, Moon, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
+import { useSiteLogo } from '../../hooks/useSiteLogo';
 
 const navLinks = [
   { name: 'Home', path: '/' },
@@ -25,6 +26,7 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const logoUrl = useSiteLogo();
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -49,7 +51,7 @@ export function Navbar() {
             {/* LOGO */}
             <Link to="/" className="flex items-center gap-3">
               <motion.img
-                src="https://cleanhikenepal.com/images/196/20503543/cleanHikenepallogo-PPWY3hOAc9-6vQ81N66zMw-zZ-kom6O7oLkwfBB8h7zHA.png"
+                src={logoUrl}
                 alt="CleanHike Logo"
                 className="w-12 h-12 rounded-full object-contain"
                 whileHover={{ rotate: 360 }}

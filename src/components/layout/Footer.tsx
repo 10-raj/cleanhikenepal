@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {  MapPin, Mail, Phone, Facebook, Twitter, Instagram, Youtube, Heart } from 'lucide-react';
+import { useSiteLogo } from '../../hooks/useSiteLogo';
 
 const quickLinks = [
   { name: 'All Hikes', path: '/hikes' },
@@ -24,6 +25,8 @@ const socialLinks = [
 ];
 
 export function Footer() {
+  const logoUrl = useSiteLogo();
+
   return (
     <footer className="relative bg-gradient-to-br from-gray-900 via-emerald-950 to-gray-900 text-white overflow-hidden">
       {/* Background Pattern */}
@@ -43,7 +46,7 @@ export function Footer() {
             <Link to="/" className="flex items-center gap-3 group">
               
                 <motion.img
-  src="https://cleanhikenepal.com/images/196/20503543/cleanHikenepallogo-PPWY3hOAc9-6vQ81N66zMw-zZ-kom6O7oLkwfBB8h7zHA.png"
+  src={logoUrl}
   alt="CleanHike Logo"
   className="w-12 h-12 rounded-full object-contain"
   whileHover={{ rotate: 360 }}
