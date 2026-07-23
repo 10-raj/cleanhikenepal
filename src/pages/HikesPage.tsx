@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, MapPin, SortAsc } from 'lucide-react';
-import { hikesData } from '../data/hikes';
+import { useHikes } from '../hooks/useHikes';
 import { HikeCard } from '../components/cards/HikeCard';
 import { ScrollReveal } from '../components/common/ContainerScroll';
 
@@ -11,13 +11,14 @@ export function HikesPage() {
   const [search, setSearch] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState('All');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const { hikes } = useHikes();
 
   const filteredHikes = useMemo(() => {
-    let hikes = [...hikesData];
+    let result = [...hikes];
 
     // Filter by search
     if (search) {
-      hikes = hikes.filter(hike =>
+      result = result.filter(hike =>
         hike.name.toLowerCase().includes(search.toLowerCase()) ||
         hike.location.toLowerCase().includes(search.toLowerCase()) ||
         hike.region.toLowerCase().includes(search.toLowerCase())
@@ -26,18 +27,18 @@ export function HikesPage() {
 
     // Filter by difficulty
     if (selectedDifficulty !== 'All') {
-      hikes = hikes.filter(hike => hike.difficulty === selectedDifficulty);
+      result = result.filter(hike => hike.difficulty === selectedDifficulty);
     }
 
     // Sort by duration (assuming format like "14 days")
-    hikes.sort((a, b) => {
+    result.sort((a, b) => {
       const aDays = parseInt(a.duration);
       const bDays = parseInt(b.duration);
       return sortOrder === 'asc' ? aDays - bDays : bDays - aDays;
     });
 
-    return hikes;
-  }, [search, selectedDifficulty, sortOrder]);
+    return result;
+  }, [hikes, search, selectedDifficulty, sortOrder]);
 
   return (
     <div className="min-h-screen pt-24 pb-16 bg-gray-50 dark:bg-gray-950">
