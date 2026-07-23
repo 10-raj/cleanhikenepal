@@ -17,6 +17,13 @@ export interface Hike {
   groupSize: string;
   rating: number;
   reviewCount: number;
+  slug?: string;
+  hikeDate?: string | null;
+  video?: string;
+  routeUrl?: string;
+  mapUrl?: string;
+  availableSeats?: number | null;
+  status?: 'published' | 'draft';
 }
 
 export interface Sponsor {
@@ -56,32 +63,4 @@ export interface ContactFormData {
   email: string;
   subject: string;
   message: string;
-}
-
-export interface Hike {
-  id: string;
-  name: string;
-  location: string;
-  region: string;
-
-  difficulty: 'Easy' | 'Moderate' | 'Challenging' | 'Hard';
-  duration: string;
-  distance: string;
-
-  maxElevation: number;
-  bestSeason: string[];
-
-  description: string;
-  highlights: string[];
-
-  image: string;
-  gallery: string[];
-
-  featured: boolean;
-
-  price: number;
-  groupSize: string;
-
-  rating: number;
-  reviewCount: number;
 }

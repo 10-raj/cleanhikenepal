@@ -20,6 +20,7 @@ interface HikeRow {
   image: string;
   featured: boolean;
   price: number;
+  group_size: string;
   rating: number;
   highlights: string[];
   best_season: string[];
@@ -34,7 +35,7 @@ interface HikeRow {
 const emptyForm: Partial<HikeRow> = {
   name: '', slug: '', location: '', region: '', difficulty: 'Moderate',
   duration: '', distance: '', max_elevation: 0, description: '', image: '',
-  featured: false, price: 0, rating: 4.5, highlights: [], best_season: [],
+  featured: false, price: 0, group_size: '2-10 people', rating: 4.5, highlights: [], best_season: [],
   hike_date: null, video: '', route_url: '', map_url: '', available_seats: null,
   status: 'published',
 };
@@ -226,8 +227,11 @@ export function HikesManager() {
             <Field label="Rating"><input type="number" step="0.1" className={inputClass} value={form.rating || 4.5} onChange={e => setForm({ ...form, rating: Number(e.target.value) })} /></Field>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
+            <Field label="Group Size" required><input className={inputClass} value={form.group_size || ''} onChange={e => setForm({ ...form, group_size: e.target.value })} placeholder="e.g. 2-10 people" /></Field>
             <Field label="Date"><input type="date" className={inputClass} value={form.hike_date || ''} onChange={e => setForm({ ...form, hike_date: e.target.value || null })} /></Field>
             <Field label="Available Seats"><input type="number" className={inputClass} value={form.available_seats ?? ''} onChange={e => setForm({ ...form, available_seats: e.target.value === '' ? null : Number(e.target.value) })} placeholder="Leave blank for unlimited" /></Field>
+          </div>
+          <div className="grid md:grid-cols-3 gap-4">
             <Field label="Status">
               <select className={inputClass} value={form.status || 'published'} onChange={e => setForm({ ...form, status: e.target.value as 'published' | 'draft' })}>
                 <option value="published">Published</option>

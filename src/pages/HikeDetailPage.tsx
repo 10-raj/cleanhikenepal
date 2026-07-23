@@ -10,15 +10,22 @@ import {
   ArrowLeft,
   Mountain,
 } from 'lucide-react';
-import { hikesData } from '../data/hikes';
+import { useHike } from '../hooks/useHikes';
 import { Button } from '../components/ui/Button';
 import { DifficultyBadge } from '../components/ui/Badge';
 import { ScrollReveal } from '../components/common/ContainerScroll';
 
 export function HikeDetailPage() {
   const { id } = useParams();
+  const { hike, loading } = useHike(id || '');
 
-  const hike = hikesData.find((h) => h.id === id);
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!hike) {
     return (
