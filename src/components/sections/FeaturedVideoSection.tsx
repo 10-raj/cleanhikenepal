@@ -3,6 +3,7 @@ import { Video } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../services/supabase';
 import { ScrollReveal } from '../common/ContainerScroll';
+import { getVideoEmbedInfo } from '../../utils/videoEmbed';
 
 interface FeaturedVideo {
   url: string;
@@ -66,17 +67,33 @@ export function FeaturedVideoSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="relative rounded-3xl overflow-hidden shadow-2xl"
+            className="relative rounded-3xl overflow-hidden shadow-2xl aspect-video"
           >
-            <video
-              src={video.url}
-              controls
-              playsInline
-              className="w-full aspect-video object-cover"
-              poster="https://images.pexels.com/photos/2387878/pexels-photo-2387878.jpeg?auto=compress&cs=tinysrgb&w=1200"
-            >
-              Your browser does not support the video tag.
-            </video>
+            {(() => {
+              const embed = getVideoEmbedInfo(video.url);
+              if (embed.type === 'youtube' || embed.type === 'vimeo') {
+                return (
+                  <iframe
+                    src={embed.embedUrl}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title={video.title}
+                  />
+                );
+              }
+              return (
+                <video
+                  src={embed.type === 'file' ? embed.url : undefined}
+                  controls
+                  playsInline
+                  className="w-full h-full object-cover"
+                  poster="https://images.pexels.com/photos/2387878/pexels-photo-2387878.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              );
+            })()}
           </motion.div>
         </ScrollReveal>
       </div>

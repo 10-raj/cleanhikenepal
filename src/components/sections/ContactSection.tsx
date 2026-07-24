@@ -78,7 +78,6 @@ const defaultNextHike = {
   difficulty: 'Easy',
   participants: '50 Volunteers',
   registration_link: '',
-  image: '',
 };
 
 export function ContactSection() {
@@ -124,7 +123,7 @@ export function ContactSection() {
       try {
         const { data } = await supabase
           .from('website_settings')
-          .select('next_hike_name, next_hike_location, next_hike_date, next_hike_description, next_hike_time, next_hike_meeting_point, next_hike_difficulty, next_hike_registration_link, next_hike_image, next_hike_participants')
+          .select('next_hike_name, next_hike_location, next_hike_date, next_hike_description, next_hike_time, next_hike_meeting_point, next_hike_difficulty, next_hike_registration_link, next_hike_participants')
           .limit(1)
           .maybeSingle();
         if (data) {
@@ -138,7 +137,6 @@ export function ContactSection() {
             difficulty: data.next_hike_difficulty || defaultNextHike.difficulty,
             participants: (data as any).next_hike_participants || defaultNextHike.participants,
             registration_link: data.next_hike_registration_link || '',
-            image: data.next_hike_image || '',
           });
         }
       } catch { /* use defaults */ }
@@ -347,6 +345,17 @@ export function ContactSection() {
                   <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed border-t border-emerald-200/60 dark:border-emerald-800/60 pt-4">
                     {nextHike.description}
                   </p>
+                )}
+
+                {nextHike.registration_link && (
+                  <a
+                    href={nextHike.registration_link}
+                    target={nextHike.registration_link.startsWith('http') ? '_blank' : undefined}
+                    rel={nextHike.registration_link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors"
+                  >
+                    Register Now
+                  </a>
                 )}
               </div>
             </motion.div>

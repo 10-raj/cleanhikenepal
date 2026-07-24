@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Upload, X, Loader2, Link as LinkIcon, Video } from 'lucide-react';
 import { supabase } from '../../services/supabase';
 import { inputClass } from './AdminUI';
+import { getVideoEmbedInfo } from '../../utils/videoEmbed';
 
 interface VideoUploadProps {
   value: string;
@@ -74,16 +75,31 @@ export function VideoUpload({ value, onChange, label = 'Video' }: VideoUploadPro
             className={inputClass}
             value={value}
             onChange={e => onChange(e.target.value)}
-            placeholder="https://... (mp4, webm, mov)"
+            placeholder="https://... (YouTube, Vimeo, or direct .mp4/.webm/.mov link)"
           />
+          {value && (() => {
+            const embed = getVideoEmbedInfo(value);
+            if (embed.type === 'youtube' || embed.type === 'vimeo') {
+              return (
+                <iframe
+                  src={embed.embedUrl}
+                  className="w-full aspect-video rounded-xl bg-black"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="Video preview"
+                />
+              );
+            }
+            return (
+              <video src={embed.type === 'file' ? embed.url : undefined} controls className="w-full rounded-xl max-h-40 bg-black">
+                Your browser does not support the video tag.
+              </video>
+            );
+          })()}
           {value && (
-            <video
-              src={value}
-              controls
-              className="w-full rounded-xl max-h-40 bg-black"
-            >
-              Your browser does not support the video tag.
-            </video>
+            <button type="button" onClick={clearVideo} className="text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1">
+              <X className="w-3 h-3" /> Remove video
+            </button>
           )}
         </div>
       ) : (
@@ -129,13 +145,18 @@ export function VideoUpload({ value, onChange, label = 'Video' }: VideoUploadPro
             )}
           </div>
           {value && (
-            <video
-              src={value}
-              controls
-              className="w-full rounded-xl max-h-48 bg-black"
-            >
-              Your browser does not support the video tag.
-            </video>
+            <>
+              <video
+                src={value}
+                controls
+                className="w-full rounded-xl max-h-48 bg-black"
+              >
+                Your browser does not support the video tag.
+              </video>
+              <button type="button" onClick={clearVideo} className="text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1">
+                <X className="w-3 h-3" /> Remove video
+              </button>
+            </>
           )}
         </div>
       )}
