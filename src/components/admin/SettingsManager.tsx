@@ -26,7 +26,6 @@ interface SettingsRow {
   next_hike_difficulty: string;
   next_hike_registration_link: string;
   next_hike_map_url: string;
-  next_hike_image: string;
   next_hike_participants: string;
   featured_photo_image: string;
   featured_photo_title: string;
@@ -160,7 +159,6 @@ export function SettingsManager({ sections }: { sections?: SettingsSection[] }) 
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">Next Clean Hike (Contact Page)</h2>
           </div>
           <div className="space-y-4">
-            <ImageUpload label="Hike Featured Image" folder="next-hike" value={form.next_hike_image || ''} onChange={url => setForm({ ...form, next_hike_image: url })} />
             <Field label="Hike Name"><input className={inputClass} value={form.next_hike_name || ''} onChange={e => setForm({ ...form, next_hike_name: e.target.value })} /></Field>
             <Field label="Hike Location"><input className={inputClass} value={form.next_hike_location || ''} onChange={e => setForm({ ...form, next_hike_location: e.target.value })} /></Field>
             <div className="grid md:grid-cols-2 gap-4">
