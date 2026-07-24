@@ -19,7 +19,7 @@ const socialLinks = [
   { icon: Facebook, url: 'https://facebook.com' },
   { icon: Instagram, url: 'https://www.instagram.com/cleanhike.np/' },
   { icon: Twitter, url: 'https://twitter.com' },
-  { icon: Youtube, url: 'https://youtube.com' },
+  { icon: Youtube, url: 'https://www.youtube.com/@CleanHikeNepal' },
 ];
 
 export function Navbar() {

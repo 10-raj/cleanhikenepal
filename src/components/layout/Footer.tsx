@@ -21,7 +21,7 @@ const socialLinks = [
   { name: 'Facebook', icon: Facebook, url: 'https://www.facebook.com/' },
   { name: 'Twitter', icon: Twitter, url: 'https://twitter.com/' },
   { name: 'Instagram', icon: Instagram, url: 'https://www.instagram.com/cleanhike.np/' },
-  { name: 'YouTube', icon: Youtube, url: 'https://www.youtube.com/' },
+  { name: 'YouTube', icon: Youtube, url: 'https://www.youtube.com/@CleanHikeNepal' },
 ];
 
 export function Footer() {
