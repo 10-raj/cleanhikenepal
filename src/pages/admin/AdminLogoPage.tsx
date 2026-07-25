@@ -20,7 +20,7 @@ export function AdminLogoPage() {
       const { data, error: err } = await supabase
         .from('website_settings')
         .select('site_logo_url')
-        .order('created_at', { ascending: true })
+        .order('id', { ascending: true })
         .limit(1)
         .maybeSingle();
       if (err) throw err;
@@ -42,7 +42,7 @@ export function AdminLogoPage() {
       const { data: settings } = await supabase
         .from('website_settings')
         .select('id')
-        .order('created_at', { ascending: true })
+        .order('id', { ascending: true })
         .limit(1)
         .maybeSingle();
       if (!settings?.id) {
@@ -70,7 +70,7 @@ export function AdminLogoPage() {
       const { data: settings } = await supabase
         .from('website_settings')
         .select('id')
-        .order('created_at', { ascending: true })
+        .order('id', { ascending: true })
         .limit(1)
         .maybeSingle();
       if (settings?.id) {

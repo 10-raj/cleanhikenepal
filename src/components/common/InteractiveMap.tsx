@@ -33,7 +33,7 @@ export function InteractiveMap() {
         const { data } = await supabase
           .from('website_settings')
           .select('next_hike_map_url, next_hike_name, next_hike_location')
-          .order('created_at', { ascending: true })
+          .order('id', { ascending: true })
           .limit(1)
           .maybeSingle();
         if (data) {

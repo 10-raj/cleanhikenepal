@@ -17,7 +17,7 @@ export function useSiteLogo() {
         const { data } = await supabase
           .from('website_settings')
           .select('site_logo_url')
-          .order('created_at', { ascending: true })
+          .order('id', { ascending: true })
           .limit(1)
           .maybeSingle();
         if (!cancelled && data?.site_logo_url) {

@@ -125,7 +125,7 @@ export function ContactSection() {
         const { data } = await supabase
           .from('website_settings')
           .select('next_hike_name, next_hike_location, next_hike_date, next_hike_description, next_hike_time, next_hike_meeting_point, next_hike_difficulty, next_hike_registration_link, next_hike_participants, next_hike_active')
-          .order('created_at', { ascending: true })
+          .order('id', { ascending: true })
           .limit(1)
           .maybeSingle();
         if (data) {

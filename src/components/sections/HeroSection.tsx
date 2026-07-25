@@ -22,7 +22,7 @@ export function HeroSection() {
         const { data } = await supabase
           .from('website_settings')
           .select('stat_completed_hikes, stat_volunteers, stat_waste_collected, stat_partners')
-          .order('created_at', { ascending: true })
+          .order('id', { ascending: true })
           .limit(1)
           .maybeSingle();
         if (data) {

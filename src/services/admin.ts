@@ -322,7 +322,7 @@ export async function getWebsiteSettings() {
   const { data, error } = await supabase
     .from('website_settings')
     .select('*')
-    .order('created_at', { ascending: true })
+    .order('id', { ascending: true })
     .limit(1)
     .maybeSingle();
 
@@ -334,7 +334,7 @@ export async function updateWebsiteSettings(settings: Record<string, any>) {
   const { data: existing, error: lookupError } = await supabase
     .from('website_settings')
     .select('id')
-    .order('created_at', { ascending: true })
+    .order('id', { ascending: true })
     .limit(1)
     .maybeSingle();
 
