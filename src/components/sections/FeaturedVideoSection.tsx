@@ -26,6 +26,7 @@ export function FeaturedVideoSection() {
         const { data } = await supabase
           .from('website_settings')
           .select('featured_video_url, featured_video_title, featured_video_description')
+          .order('created_at', { ascending: true })
           .limit(1)
           .maybeSingle();
         if (data) {
@@ -71,7 +72,7 @@ export function FeaturedVideoSection() {
           >
             {(() => {
               const embed = getVideoEmbedInfo(video.url);
-              if (embed.type === 'youtube' || embed.type === 'vimeo') {
+              if (embed.type === 'youtube' || embed.type === 'vimeo' || embed.type === 'instagram') {
                 return (
                   <iframe
                     src={embed.embedUrl}

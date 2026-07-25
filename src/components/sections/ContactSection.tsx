@@ -78,6 +78,7 @@ const defaultNextHike = {
   difficulty: 'Easy',
   participants: '50 Volunteers',
   registration_link: '',
+  active: true,
 };
 
 export function ContactSection() {
@@ -123,7 +124,8 @@ export function ContactSection() {
       try {
         const { data } = await supabase
           .from('website_settings')
-          .select('next_hike_name, next_hike_location, next_hike_date, next_hike_description, next_hike_time, next_hike_meeting_point, next_hike_difficulty, next_hike_registration_link, next_hike_participants')
+          .select('next_hike_name, next_hike_location, next_hike_date, next_hike_description, next_hike_time, next_hike_meeting_point, next_hike_difficulty, next_hike_registration_link, next_hike_participants, next_hike_active')
+          .order('created_at', { ascending: true })
           .limit(1)
           .maybeSingle();
         if (data) {
@@ -137,6 +139,7 @@ export function ContactSection() {
             difficulty: data.next_hike_difficulty || defaultNextHike.difficulty,
             participants: (data as any).next_hike_participants || defaultNextHike.participants,
             registration_link: data.next_hike_registration_link || '',
+            active: (data as any).next_hike_active !== false,
           });
         }
       } catch { /* use defaults */ }
@@ -267,6 +270,8 @@ export function ContactSection() {
               viewport={{ once: true }}
               className="rounded-3xl overflow-hidden border border-emerald-200 dark:border-emerald-800 shadow-xl bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/10"
             >
+              {nextHike.active ? (
+              <>
               {/* Card header */}
               <div className="bg-gradient-to-r from-emerald-600 to-green-600 px-6 py-4 flex items-center gap-3">
                 <Mountain className="w-6 h-6 text-white" />
@@ -358,6 +363,18 @@ export function ContactSection() {
                   </a>
                 )}
               </div>
+              </>
+              ) : (
+                <div className="p-10 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-white dark:bg-gray-800 shadow flex items-center justify-center mx-auto mb-4">
+                    <Mountain className="w-7 h-7 text-emerald-600" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">More Hikes Coming Soon</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm max-w-md mx-auto">
+                    We're planning our next community clean hike. Check back soon or reach out below and we'll let you know as soon as it's announced.
+                  </p>
+                </div>
+              )}
             </motion.div>
           </ScrollReveal>
         </div>

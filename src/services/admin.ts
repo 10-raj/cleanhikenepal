@@ -322,19 +322,23 @@ export async function getWebsiteSettings() {
   const { data, error } = await supabase
     .from('website_settings')
     .select('*')
+    .order('created_at', { ascending: true })
     .limit(1)
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
   return data;
 }
 
 export async function updateWebsiteSettings(settings: Record<string, any>) {
-  const { data: existing } = await supabase
+  const { data: existing, error: lookupError } = await supabase
     .from('website_settings')
     .select('id')
+    .order('created_at', { ascending: true })
     .limit(1)
-    .single();
+    .maybeSingle();
+
+  if (lookupError) throw lookupError;
 
   if (existing) {
     const { data, error } = await supabase

@@ -6,7 +6,7 @@
  * broken even though the URL saved correctly.
  */
 export type VideoEmbedInfo =
-  | { type: 'youtube' | 'vimeo'; embedUrl: string }
+  | { type: 'youtube' | 'vimeo' | 'instagram'; embedUrl: string }
   | { type: 'file'; url: string }
   | { type: 'none' };
 
@@ -23,6 +23,11 @@ export function getVideoEmbedInfo(url: string | null | undefined): VideoEmbedInf
   const vimeoMatch = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
   if (vimeoMatch) {
     return { type: 'vimeo', embedUrl: `https://player.vimeo.com/video/${vimeoMatch[1]}` };
+  }
+
+  const instagramMatch = url.match(/instagram\.com\/(p|reel|tv)\/([a-zA-Z0-9_-]+)/);
+  if (instagramMatch) {
+    return { type: 'instagram', embedUrl: `https://www.instagram.com/${instagramMatch[1]}/${instagramMatch[2]}/embed` };
   }
 
   return { type: 'file', url };

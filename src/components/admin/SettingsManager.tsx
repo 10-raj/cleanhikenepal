@@ -25,6 +25,7 @@ interface SettingsRow {
   next_hike_meeting_point: string;
   next_hike_difficulty: string;
   next_hike_registration_link: string;
+  next_hike_active: boolean;
   next_hike_map_url: string;
   next_hike_participants: string;
   featured_photo_image: string;
@@ -158,7 +159,16 @@ export function SettingsManager({ sections }: { sections?: SettingsSection[] }) 
             </div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">Next Clean Hike (Contact Page)</h2>
           </div>
-          <div className="space-y-4">
+          <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 mb-4 p-3 rounded-xl bg-gray-50 dark:bg-gray-900/40">
+            <input
+              type="checkbox"
+              checked={form.next_hike_active !== false}
+              onChange={e => setForm({ ...form, next_hike_active: e.target.checked })}
+              className="rounded"
+            />
+            Hike currently scheduled — uncheck this when nothing is planned yet. The Contact page will show a "more hikes coming soon" message instead of these details.
+          </label>
+          <div className={`space-y-4 ${form.next_hike_active === false ? 'opacity-50 pointer-events-none' : ''}`}>
             <Field label="Hike Name"><input className={inputClass} value={form.next_hike_name || ''} onChange={e => setForm({ ...form, next_hike_name: e.target.value })} /></Field>
             <Field label="Hike Location"><input className={inputClass} value={form.next_hike_location || ''} onChange={e => setForm({ ...form, next_hike_location: e.target.value })} /></Field>
             <div className="grid md:grid-cols-2 gap-4">

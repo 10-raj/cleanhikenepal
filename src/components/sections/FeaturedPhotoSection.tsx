@@ -29,6 +29,7 @@ export function FeaturedPhotoSection() {
         const { data } = await supabase
           .from('website_settings')
           .select('featured_photo_image, featured_photo_title, featured_photo_description, featured_photo_link')
+          .order('created_at', { ascending: true })
           .limit(1)
           .maybeSingle();
         if (data) {

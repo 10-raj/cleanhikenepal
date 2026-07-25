@@ -75,11 +75,11 @@ export function VideoUpload({ value, onChange, label = 'Video' }: VideoUploadPro
             className={inputClass}
             value={value}
             onChange={e => onChange(e.target.value)}
-            placeholder="https://... (YouTube, Vimeo, or direct .mp4/.webm/.mov link)"
+            placeholder="https://... (YouTube, Vimeo, Instagram, or direct .mp4/.webm/.mov link)"
           />
           {value && (() => {
             const embed = getVideoEmbedInfo(value);
-            if (embed.type === 'youtube' || embed.type === 'vimeo') {
+            if (embed.type === 'youtube' || embed.type === 'vimeo' || embed.type === 'instagram') {
               return (
                 <iframe
                   src={embed.embedUrl}
