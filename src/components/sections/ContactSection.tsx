@@ -463,22 +463,33 @@ export function ContactSection() {
 
                 {/* Next Clean Hike — read-only, auto-populated from the Admin Panel.
                     Only shown for the Join Us for Clean Hike purpose, between
-                    Phone and "How many people will be joining". */}
+                    Phone and "How many people will be joining". Mirrors the
+                    same active/no-hike-scheduled state as the card above. */}
                 {selectedPurpose === 'join_hike' && (
                   <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/10 p-4">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Next Clean Hike</p>
-                      <span className="text-[10px] uppercase tracking-wide text-emerald-500 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">Auto-filled</span>
+                      {nextHike.active && (
+                        <span className="text-[10px] uppercase tracking-wide text-emerald-500 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">Auto-filled</span>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                      <span className="font-medium text-gray-900 dark:text-white">Date:</span> {nextHike.date}
-                    </p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
-                      <span className="font-medium text-gray-900 dark:text-white">Location:</span> {nextHike.location}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                      This is set automatically from the Admin Panel and can't be edited here.
-                    </p>
+                    {nextHike.active ? (
+                      <>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                          <span className="font-medium text-gray-900 dark:text-white">Date:</span> {nextHike.date}
+                        </p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                          <span className="font-medium text-gray-900 dark:text-white">Location:</span> {nextHike.location}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                          This is set automatically from the Admin Panel and can't be edited here.
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        No hike is scheduled right now — we're still planning the next one. Submit this form anyway and we'll reach out as soon as it's announced.
+                      </p>
+                    )}
                   </div>
                 )}
 
