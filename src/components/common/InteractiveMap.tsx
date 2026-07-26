@@ -34,7 +34,7 @@ const defaultMapUrl = 'https://maps.google.com/maps?q=Jamacho+Gumba+Kathmandu&z=
 
 export function InteractiveMap() {
   const [embedUrl, setEmbedUrl] = useState(defaultMapUrl);
-  const [linkOnlyUrl, setLinkOnlyUrl] = useState('');
+  const [directionsUrl, setDirectionsUrl] = useState('');
   const [label, setLabel] = useState('Next Hike Location');
 
   useEffect(() => {
@@ -49,10 +49,16 @@ export function InteractiveMap() {
         if (data) {
           if (data.next_hike_map_url) {
             if (isShortLink(data.next_hike_map_url)) {
-              setLinkOnlyUrl(data.next_hike_map_url);
+              // Short links can't be embedded, but we can still show a real
+              // map by searching for the location name instead, and keep
+              // the exact short link as a precise "Open in Google Maps" button.
+              setDirectionsUrl(data.next_hike_map_url);
+              if (data.next_hike_location) {
+                setEmbedUrl(`https://maps.google.com/maps?q=${encodeURIComponent(data.next_hike_location)}&z=14&output=embed`);
+              }
             } else {
               setEmbedUrl(toEmbedUrl(data.next_hike_map_url));
-              setLinkOnlyUrl('');
+              setDirectionsUrl(data.next_hike_map_url);
             }
           }
           if (data.next_hike_name || data.next_hike_location) {
@@ -63,27 +69,6 @@ export function InteractiveMap() {
     }
     fetchMapUrl();
   }, []);
-
-  if (linkOnlyUrl) {
-    return (
-      <a
-        href={linkOnlyUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="relative w-full h-full flex flex-col items-center justify-center gap-4 bg-gradient-to-br from-emerald-50 to-green-100 dark:from-emerald-900/20 dark:to-green-900/10 hover:from-emerald-100 hover:to-green-200 dark:hover:from-emerald-900/30 dark:hover:to-green-900/20 transition-colors group"
-      >
-        <div className="w-14 h-14 rounded-2xl bg-white dark:bg-gray-800 shadow-lg flex items-center justify-center group-hover:scale-105 transition-transform">
-          <MapPin className="w-7 h-7 text-emerald-600" />
-        </div>
-        <div className="text-center px-6">
-          <p className="font-semibold text-gray-900 dark:text-white text-sm mb-1">{label}</p>
-          <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 text-sm font-medium">
-            Open in Google Maps <ExternalLink className="w-3.5 h-3.5" />
-          </span>
-        </div>
-      </a>
-    );
-  }
 
   return (
     <div className="relative w-full h-full">
@@ -102,6 +87,16 @@ export function InteractiveMap() {
           <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{label}</span>
         </div>
       </div>
+      {directionsUrl && (
+        <a
+          href={directionsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-3 right-3 z-[1000] inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-2.5 rounded-xl shadow-lg transition-colors"
+        >
+          Open in Google Maps <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+      )}
     </div>
   );
 }

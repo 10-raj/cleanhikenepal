@@ -185,7 +185,7 @@ export function SettingsManager({ sections }: { sections?: SettingsSection[] }) 
                 <Map className="w-4 h-4" /> Google Maps URL
               </label>
               <input className={inputClass} value={form.next_hike_map_url || ''} onChange={e => setForm({ ...form, next_hike_map_url: e.target.value })} placeholder="https://maps.app.goo.gl/... or a full embed URL" />
-              <p className="text-xs text-gray-400 mt-1">Paste any Google Maps link. Short share links (maps.app.goo.gl) show as a tappable "Open in Google Maps" card since Google doesn't allow those to be embedded directly; a full embed URL shows an inline map instead.</p>
+              <p className="text-xs text-gray-400 mt-1">Paste any Google Maps link. The Contact page always shows a real embedded map (built from the Location field above); if you paste a short share link (maps.app.goo.gl), it's also added as an exact "Open in Google Maps" button, since Google doesn't allow those short links to be embedded directly.</p>
             </div>
           </div>
         </div>
