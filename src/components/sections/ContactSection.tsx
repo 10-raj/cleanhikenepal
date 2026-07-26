@@ -381,19 +381,6 @@ export function ContactSection() {
 
         {/* ─── Contact Form ─── */}
         <div className="grid lg:grid-cols-2 gap-10 lg:items-start">
-          {/* Map & Location */}
-          <ScrollReveal>
-            <div className="space-y-6 lg:sticky lg:top-24">
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Find Us</h3>
-                <p className="text-gray-500 dark:text-gray-400">We're based in Kathmandu, Nepal — come visit us!</p>
-              </div>
-              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-700 h-[320px] sm:h-[380px] lg:h-[420px]">
-                <InteractiveMap />
-              </div>
-            </div>
-          </ScrollReveal>
-
           {/* Purpose Selector + Form */}
           <ScrollReveal>
             <div id="join-us-for-clean-hike" ref={formRef} className="scroll-mt-24">
@@ -636,6 +623,19 @@ export function ContactSection() {
                   )}
                 </button>
               </motion.form>
+            </div>
+          </ScrollReveal>
+
+          {/* Map & Location */}
+          <ScrollReveal>
+            <div className="space-y-6 lg:sticky lg:top-24">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Find Us</h3>
+                <p className="text-gray-500 dark:text-gray-400">We're based in Kathmandu, Nepal — come visit us!</p>
+              </div>
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-700 h-[320px] sm:h-[380px] lg:h-[420px]">
+                <InteractiveMap />
+              </div>
             </div>
           </ScrollReveal>
         </div>
