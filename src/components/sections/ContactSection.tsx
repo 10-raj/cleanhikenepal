@@ -214,7 +214,7 @@ export function ContactSection() {
 
         {/* Contact Info Cards */}
         <ScrollReveal>
-          <div className="grid grid-cols-1 gap-4 mb-10 max-w-2xl mx-auto w-full">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {contactInfo.map((info) => {
               const cardClass = "p-5 rounded-2xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:border-emerald-500/50 transition-all text-center group";
               const cardContent = (
