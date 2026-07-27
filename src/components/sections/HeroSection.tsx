@@ -54,9 +54,9 @@ export function HeroSection() {
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-green-900 to-gray-900" />
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-30"
           style={{
-            backgroundImage: `url('https://images.pexels.com/photos/2387878/pexels-photo-2387878.jpeg?auto=compress&cs=tinysrgb&w=1920')`,
+            backgroundImage: `url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0g2B7cVSurqfCRQEQmWYeprlkLwvWPdTLbiqQ27ybWw&s=10')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
@@ -132,7 +132,7 @@ export function HeroSection() {
 >
   {/* Primary CTA */}
   <div className="flex justify-center">
-    <Link to="/contact">
+    <Link to="/contact#join-us-for-clean-hike">
       <Button
         size="lg"
         className="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-4 text-lg flex items-center justify-center group"

@@ -479,11 +479,16 @@ export function ContactSection() {
                           <span className="font-medium text-gray-900 dark:text-white">Date:</span> {nextHike.date}
                         </p>
                         <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
-                          <span className="font-medium text-gray-900 dark:text-white">Location:</span> {nextHike.location}
+                          <span className="font-medium text-gray-900 dark:text-white">Location:</span> {nextHike.location} </p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                          <span className="font-medium text-gray-900 dark:text-white">Time:</span> {nextHike.time}</p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                          <span className="font-medium text-gray-900 dark:text-white">Meeting Point:</span> {nextHike.meeting_point} 
+                        {/* </p>
+                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                          This is set automatically from the Admin Panel and can't be edited here. */}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                          This is set automatically from the Admin Panel and can't be edited here.
-                        </p>
+                        
                       </>
                     ) : (
                       <p className="text-sm text-gray-700 dark:text-gray-300">
@@ -641,8 +646,8 @@ export function ContactSection() {
           <ScrollReveal>
             <div className="space-y-6 lg:sticky lg:top-24">
               <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Find Us</h3>
-                <p className="text-gray-500 dark:text-gray-400">We're based in Kathmandu, Nepal — come visit us!</p>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Start Your Journey With Us</h3>
+                <p className="text-gray-500 dark:text-gray-400">Whether it's our next community hike or our home base, you'll find us at the location below. We look forward to welcoming you!</p>
               </div>
               <div className="rounded-3xl overflow-hidden shadow-xl border border-gray-100 dark:border-gray-700 h-[320px] sm:h-[380px] lg:h-[420px]">
                 <InteractiveMap />
