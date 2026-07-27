@@ -61,7 +61,7 @@ export function HikesPage() {
         Explore Nepal's Trails
         </motion.h1>
         <p className="text-gray-200" >
-        with {""} 
+        with our partner{""} 
         </p>
         <a
         href="https://nepaltourandtrek.com/"

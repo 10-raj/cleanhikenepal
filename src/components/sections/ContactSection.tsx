@@ -95,18 +95,18 @@ export function ContactSection() {
   const [howHeard, setHowHeard] = useState<string>('');
   const [nextHike, setNextHike] = useState(defaultNextHike);
 
+  const scrollToSection = (id: string, purpose?: string) => {
+    if (purpose) setSelectedPurpose(purpose);
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
+  };
+
   // Auto-scroll and auto-select purpose based on URL hash
   useEffect(() => {
     const hash = location.hash;
     if (!hash) return;
-
-    const scrollToSection = (id: string, purpose?: string) => {
-      if (purpose) setSelectedPurpose(purpose);
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 200);
-    };
 
     if (hash === '#join-us-for-clean-hike') {
       scrollToSection('join-us-for-clean-hike', 'join_hike');
@@ -387,8 +387,8 @@ export function ContactSection() {
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Send us a Message</h3>
               <p className="text-gray-500 dark:text-gray-400 mb-6">Choose your inquiry type and fill in the form below.</p>
 
-              {/* Purpose Selector */}
-              <div className="grid grid-cols-1 gap-3 mb-8">
+              {/* Purpose Selector — horizontal tabs, wrap on smaller screens */}
+              <div className="flex flex-wrap gap-2 mb-3">
                 {purposes.map((purpose) => {
                   const isSelected = selectedPurpose === purpose.id;
                   const Icon = purpose.icon;
@@ -401,34 +401,32 @@ export function ContactSection() {
                     <div key={purpose.id} id={anchorId} className="scroll-mt-24">
                       <motion.button
                         type="button"
-                        whileHover={{ scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => setSelectedPurpose(purpose.id)}
-                        className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left ${
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-full border-2 transition-all whitespace-nowrap ${
                           isSelected
                             ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
                             : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700'
                         }`}
                       >
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                          isSelected ? 'bg-emerald-500' : 'bg-gray-100 dark:bg-gray-700'
-                        }`}>
-                          <Icon className={`w-5 h-5 ${isSelected ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`} />
-                        </div>
-                        <div>
-                          <p className={`font-semibold text-sm ${isSelected ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-900 dark:text-white'}`}>
-                            {purpose.label}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{purpose.description}</p>
-                        </div>
+                        <Icon className={`w-4 h-4 flex-shrink-0 ${isSelected ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`} />
+                        <span className={`font-semibold text-sm ${isSelected ? 'text-emerald-700 dark:text-emerald-300' : 'text-gray-900 dark:text-white'}`}>
+                          {purpose.label}
+                        </span>
                         {isSelected && (
-                          <CheckCircle className="w-5 h-5 text-emerald-500 ml-auto flex-shrink-0" />
+                          <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                         )}
                       </motion.button>
                     </div>
                   );
                 })}
               </div>
+              {purposes.find(p => p.id === selectedPurpose)?.description && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-8">
+                  {purposes.find(p => p.id === selectedPurpose)?.description}
+                </p>
+              )}
 
               {/* Form */}
               <motion.form
@@ -465,22 +463,33 @@ export function ContactSection() {
 
                 {/* Next Clean Hike — read-only, auto-populated from the Admin Panel.
                     Only shown for the Join Us for Clean Hike purpose, between
-                    Phone and "How many people will be joining". */}
+                    Phone and "How many people will be joining". Mirrors the
+                    same active/no-hike-scheduled state as the card above. */}
                 {selectedPurpose === 'join_hike' && (
                   <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/10 p-4">
                     <div className="flex items-center justify-between mb-2">
                       <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">Next Clean Hike</p>
-                      <span className="text-[10px] uppercase tracking-wide text-emerald-500 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">Auto-filled</span>
+                      {nextHike.active && (
+                        <span className="text-[10px] uppercase tracking-wide text-emerald-500 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">Auto-filled</span>
+                      )}
                     </div>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                      <span className="font-medium text-gray-900 dark:text-white">Date:</span> {nextHike.date}
-                    </p>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
-                      <span className="font-medium text-gray-900 dark:text-white">Location:</span> {nextHike.location}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                      This is set automatically from the Admin Panel and can't be edited here.
-                    </p>
+                    {nextHike.active ? (
+                      <>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                          <span className="font-medium text-gray-900 dark:text-white">Date:</span> {nextHike.date}
+                        </p>
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                          <span className="font-medium text-gray-900 dark:text-white">Location:</span> {nextHike.location}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                          This is set automatically from the Admin Panel and can't be edited here.
+                        </p>
+                      </>
+                    ) : (
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        No hike is scheduled right now — we're still planning the next one. Submit this form anyway and we'll reach out as soon as it's announced.
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -641,6 +650,28 @@ export function ContactSection() {
             </div>
           </ScrollReveal>
         </div>
+
+        {/* ─── Promotional Banner & CTA ─── */}
+        <ScrollReveal>
+          <div className="mt-12 rounded-3xl overflow-hidden bg-gradient-to-r from-emerald-600 to-green-600 px-6 py-10 sm:px-12 sm:py-12 text-center relative">
+            <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+            <div className="relative">
+              <Mountain className="w-10 h-10 text-white mx-auto mb-4" />
+              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">Ready to hit the trail?</h3>
+              <p className="text-emerald-50 max-w-xl mx-auto mb-6">
+                Bring your friends, your energy, and a trash bag — join our next community clean hike and help keep Nepal's trails beautiful.
+              </p>
+              <button
+                type="button"
+                onClick={() => scrollToSection('join-us-for-clean-hike', 'join_hike')}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-white text-emerald-700 font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+              >
+                <Mountain className="w-5 h-5" />
+                Join Upcoming Clean Hike
+              </button>
+            </div>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );

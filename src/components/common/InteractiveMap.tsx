@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, ExternalLink } from 'lucide-react';
 import { supabase } from '../../services/supabase';
+
+// Google's short links (maps.app.goo.gl, goo.gl/maps) redirect rather than
+// serve embeddable content directly — Google blocks these from working
+// inside an iframe. For these, we skip embedding entirely and show a
+// clickable "Open in Google Maps" card that links straight to the URL
+// the admin set, opening in a new tab.
+function isShortLink(url: string): boolean {
+  return /maps\.app\.goo\.gl|goo\.gl\/maps/i.test(url);
+}
 
 function toEmbedUrl(url: string): string {
   if (!url) return '';
@@ -25,6 +34,7 @@ const defaultMapUrl = 'https://maps.google.com/maps?q=Jamacho+Gumba+Kathmandu&z=
 
 export function InteractiveMap() {
   const [embedUrl, setEmbedUrl] = useState(defaultMapUrl);
+  const [directionsUrl, setDirectionsUrl] = useState('');
   const [label, setLabel] = useState('Next Hike Location');
 
   useEffect(() => {
@@ -38,7 +48,18 @@ export function InteractiveMap() {
           .maybeSingle();
         if (data) {
           if (data.next_hike_map_url) {
-            setEmbedUrl(toEmbedUrl(data.next_hike_map_url));
+            if (isShortLink(data.next_hike_map_url)) {
+              // Short links can't be embedded, but we can still show a real
+              // map by searching for the location name instead, and keep
+              // the exact short link as a precise "Open in Google Maps" button.
+              setDirectionsUrl(data.next_hike_map_url);
+              if (data.next_hike_location) {
+                setEmbedUrl(`https://maps.google.com/maps?q=${encodeURIComponent(data.next_hike_location)}&z=14&output=embed`);
+              }
+            } else {
+              setEmbedUrl(toEmbedUrl(data.next_hike_map_url));
+              setDirectionsUrl(data.next_hike_map_url);
+            }
           }
           if (data.next_hike_name || data.next_hike_location) {
             setLabel(`${data.next_hike_name || 'Next Hike'} — ${data.next_hike_location || ''}`);
@@ -66,6 +87,16 @@ export function InteractiveMap() {
           <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{label}</span>
         </div>
       </div>
+      {directionsUrl && (
+        <a
+          href={directionsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute bottom-3 right-3 z-[1000] inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium px-3 py-2.5 rounded-xl shadow-lg transition-colors"
+        >
+          Open in Google Maps <ExternalLink className="w-3.5 h-3.5" />
+        </a>
+      )}
     </div>
   );
 }
