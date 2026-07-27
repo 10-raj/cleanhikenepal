@@ -164,8 +164,8 @@ export function BannerCarousel() {
   return (
     <>
     <div
-      className="relative w-full overflow-hidden mt-16 md:mt-20"
-      style={{ height: 'clamp(400px, 80vh, 700px)' }}
+      className="relative w-full overflow-hidden mt-4 md:mt-20"
+      style={{ height: 'clamp(350px, 70vh, 700px)' }}
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
