@@ -411,24 +411,46 @@ export function BannerManager() {
 
   async function handleMoveUp(idx: number) {
     if (idx === 0) return;
+    const a = banners[idx - 1];
+    const b = banners[idx];
+    const aOrder = a.sort_order;
+    const bOrder = b.sort_order;
     const updated = [...banners];
-    [updated[idx - 1], updated[idx]] = [updated[idx], updated[idx - 1]];
+    updated[idx - 1] = { ...b, sort_order: aOrder };
+    updated[idx] = { ...a, sort_order: bOrder };
     setBanners(updated);
-    await Promise.all([
-      supabase.from('hero_banners').update({ sort_order: updated[idx - 1].sort_order }).eq('id', updated[idx - 1].id),
-      supabase.from('hero_banners').update({ sort_order: updated[idx].sort_order }).eq('id', updated[idx].id),
-    ]);
+    try {
+      const [{ error: e1 }, { error: e2 }] = await Promise.all([
+        supabase.from('hero_banners').update({ sort_order: aOrder }).eq('id', b.id),
+        supabase.from('hero_banners').update({ sort_order: bOrder }).eq('id', a.id),
+      ]);
+      if (e1 || e2) throw e1 || e2;
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to reorder banner.'));
+      await loadBanners();
+    }
   }
 
   async function handleMoveDown(idx: number) {
     if (idx === banners.length - 1) return;
+    const a = banners[idx];
+    const b = banners[idx + 1];
+    const aOrder = a.sort_order;
+    const bOrder = b.sort_order;
     const updated = [...banners];
-    [updated[idx], updated[idx + 1]] = [updated[idx + 1], updated[idx]];
+    updated[idx] = { ...b, sort_order: aOrder };
+    updated[idx + 1] = { ...a, sort_order: bOrder };
     setBanners(updated);
-    await Promise.all([
-      supabase.from('hero_banners').update({ sort_order: updated[idx].sort_order }).eq('id', updated[idx].id),
-      supabase.from('hero_banners').update({ sort_order: updated[idx + 1].sort_order }).eq('id', updated[idx + 1].id),
-    ]);
+    try {
+      const [{ error: e1 }, { error: e2 }] = await Promise.all([
+        supabase.from('hero_banners').update({ sort_order: aOrder }).eq('id', b.id),
+        supabase.from('hero_banners').update({ sort_order: bOrder }).eq('id', a.id),
+      ]);
+      if (e1 || e2) throw e1 || e2;
+    } catch (e) {
+      showError(toErrorMessage(e, 'Failed to reorder banner.'));
+      await loadBanners();
+    }
   }
 
   if (loading) return <AdminLoading />;

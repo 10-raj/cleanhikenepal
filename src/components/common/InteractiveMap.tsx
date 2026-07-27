@@ -30,7 +30,7 @@ function toEmbedUrl(url: string): string {
 }
 
 const defaultMapUrl = 'https://maps.google.com/maps?q=Jamacho+Gumba+Kathmandu&z=13&output=embed';
-
+const ORG_DEFAULT_LOCATION = 'Dakshinkali, Kathmandu, Nepal';
 
 export function InteractiveMap() {
   const [embedUrl, setEmbedUrl] = useState(defaultMapUrl);
@@ -42,28 +42,41 @@ export function InteractiveMap() {
       try {
         const { data } = await supabase
           .from('website_settings')
-          .select('next_hike_map_url, next_hike_name, next_hike_location')
+          .select('next_hike_map_url, next_hike_name, next_hike_location, next_hike_active, org_address')
           .order('id', { ascending: true })
           .limit(1)
           .maybeSingle();
-        if (data) {
-          if (data.next_hike_map_url) {
-            if (isShortLink(data.next_hike_map_url)) {
-              // Short links can't be embedded, but we can still show a real
-              // map by searching for the location name instead, and keep
-              // the exact short link as a precise "Open in Google Maps" button.
-              setDirectionsUrl(data.next_hike_map_url);
-              if (data.next_hike_location) {
-                setEmbedUrl(`https://maps.google.com/maps?q=${encodeURIComponent(data.next_hike_location)}&z=14&output=embed`);
-              }
-            } else {
-              setEmbedUrl(toEmbedUrl(data.next_hike_map_url));
-              setDirectionsUrl(data.next_hike_map_url);
+        if (!data) return;
+
+        const hikeActive = (data as any).next_hike_active !== false;
+
+        if (!hikeActive) {
+          // No hike currently scheduled — fall back to the organization's
+          // default location so the map is never left empty. Admin
+          // controls this address via Organization Contact Info in Settings.
+          const orgLocation = data.org_address || ORG_DEFAULT_LOCATION;
+          setEmbedUrl(`https://maps.google.com/maps?q=${encodeURIComponent(orgLocation)}&z=13&output=embed`);
+          setDirectionsUrl('');
+          setLabel(`Find Us — ${orgLocation}`);
+          return;
+        }
+
+        if (data.next_hike_map_url) {
+          if (isShortLink(data.next_hike_map_url)) {
+            // Short links can't be embedded, but we can still show a real
+            // map by searching for the location name instead, and keep
+            // the exact short link as a precise "Open in Google Maps" button.
+            setDirectionsUrl(data.next_hike_map_url);
+            if (data.next_hike_location) {
+              setEmbedUrl(`https://maps.google.com/maps?q=${encodeURIComponent(data.next_hike_location)}&z=14&output=embed`);
             }
+          } else {
+            setEmbedUrl(toEmbedUrl(data.next_hike_map_url));
+            setDirectionsUrl(data.next_hike_map_url);
           }
-          if (data.next_hike_name || data.next_hike_location) {
-            setLabel(`${data.next_hike_name || 'Next Hike'} — ${data.next_hike_location || ''}`);
-          }
+        }
+        if (data.next_hike_name || data.next_hike_location) {
+          setLabel(`${data.next_hike_name || 'Next Hike'} — ${data.next_hike_location || ''}`);
         }
       } catch { /* use defaults */ }
     }

@@ -52,7 +52,7 @@ const defaultSlides: BannerSlide[] = [
 ];
 
 export function BannerCarousel() {
-  const [slides, setSlides] = useState<BannerSlide[]>(defaultSlides);
+  const [slides, setSlides] = useState<BannerSlide[]>([]);
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
@@ -69,17 +69,26 @@ export function BannerCarousel() {
           .eq('status', 'published')
           .order('sort_order', { ascending: true });
 
-        if (!error && data && data.length > 0) {
+        if (error) throw error;
+
+        if (data && data.length > 0) {
           const now = new Date();
           const visible = (data as BannerSlide[]).filter(s => {
             if (s.start_date && new Date(s.start_date) > now) return false;
             if (s.end_date && new Date(s.end_date) < now) return false;
             return true;
           });
-          if (visible.length > 0) setSlides(visible);
+          // Only the banners currently active/published/in-date in the admin
+          // panel are shown - if none qualify, the carousel simply doesn't
+          // render (handled below) rather than falling back to old content.
+          setSlides(visible);
+        } else {
+          setSlides([]);
         }
       } catch {
-        // Use default slides
+        // Genuine fetch failure (network/table issue) - fall back to
+        // defaults so the homepage isn't left completely blank.
+        setSlides(defaultSlides);
       }
     }
     fetchBanners();
@@ -175,25 +184,35 @@ export function BannerCarousel() {
           className={`absolute inset-0 ${slide.button_link ? 'cursor-pointer' : ''}`}
         >
           {/* Background Image */}
-          <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gray-900">
+            {/* Blurred cover backdrop fills any letterbox space so the full
+                image can be shown without cropping, while still looking
+                intentional rather than leaving empty bars */}
+            <img
+              src={slide.image}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60"
+              loading="eager"
+            />
             <img
               src={slide.image}
               alt={slide.title}
-              className="w-full h-full object-cover hidden md:block"
+              className="absolute inset-0 w-full h-full object-contain hidden md:block"
               loading="eager"
             />
             {slide.mobile_image ? (
               <img
                 src={slide.mobile_image}
                 alt={slide.title}
-                className="w-full h-full object-cover md:hidden"
+                className="absolute inset-0 w-full h-full object-contain md:hidden"
                 loading="eager"
               />
             ) : (
               <img
                 src={slide.image}
                 alt={slide.title}
-                className="w-full h-full object-cover md:hidden"
+                className="absolute inset-0 w-full h-full object-contain md:hidden"
                 loading="eager"
               />
             )}
