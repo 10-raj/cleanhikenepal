@@ -187,6 +187,7 @@ export async function getAllHikesAdmin() {
   const { data, error } = await supabase
     .from('hikes')
     .select('*')
+    .order('display_order', { ascending: true })
     .order('created_at', { ascending: false });
 
   if (error) throw error;

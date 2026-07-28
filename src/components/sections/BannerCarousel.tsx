@@ -164,8 +164,7 @@ export function BannerCarousel() {
   return (
     <>
     <div
-      className="relative w-full overflow-hidden mt-4 md:mt-20"
-      style={{ height: 'clamp(350px, 70vh, 700px)' }}
+      className="relative w-full overflow-hidden mt-16 md:mt-20 h-[400px] sm:h-[480px] md:h-[600px] lg:h-[700px]"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -185,34 +184,24 @@ export function BannerCarousel() {
         >
           {/* Background Image */}
           <div className="absolute inset-0 bg-gray-900">
-            {/* Blurred cover backdrop fills any letterbox space so the full
-                image can be shown without cropping, while still looking
-                intentional rather than leaving empty bars */}
-            <img
-              src={slide.image}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60"
-              loading="eager"
-            />
             <img
               src={slide.image}
               alt={slide.title}
-              className="absolute inset-0 w-full h-full object-contain hidden md:block"
+              className="absolute inset-0 w-full h-full object-cover hidden md:block"
               loading="eager"
             />
             {slide.mobile_image ? (
               <img
                 src={slide.mobile_image}
                 alt={slide.title}
-                className="absolute inset-0 w-full h-full object-contain md:hidden"
+                className="absolute inset-0 w-full h-full object-cover md:hidden"
                 loading="eager"
               />
             ) : (
               <img
                 src={slide.image}
                 alt={slide.title}
-                className="absolute inset-0 w-full h-full object-contain md:hidden"
+                className="absolute inset-0 w-full h-full object-cover md:hidden"
                 loading="eager"
               />
             )}

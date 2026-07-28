@@ -29,6 +29,7 @@ function mapHikeRow(row: any): Hike {
     mapUrl: row.map_url || '',
     availableSeats: row.available_seats ?? null,
     status: row.status || 'published',
+    displayOrder: row.display_order ?? 0,
   };
 }
 
@@ -40,6 +41,7 @@ export async function getHikes(filters?: {
   let query = supabase
     .from('hikes')
     .select('*')
+    .order('display_order', { ascending: true })
     .order('featured', { ascending: false });
 
   if (filters?.difficulty && filters.difficulty !== 'All') {

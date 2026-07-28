@@ -24,6 +24,7 @@ export interface Hike {
   mapUrl?: string;
   availableSeats?: number | null;
   status?: 'published' | 'draft';
+  displayOrder?: number;
 }
 
 export interface Sponsor {

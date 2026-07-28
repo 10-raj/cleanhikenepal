@@ -30,6 +30,7 @@ interface HikeRow {
   map_url: string;
   available_seats: number | null;
   status: 'published' | 'draft';
+  display_order: number;
 }
 
 const emptyForm: Partial<HikeRow> = {
@@ -37,7 +38,7 @@ const emptyForm: Partial<HikeRow> = {
   duration: '', distance: '', max_elevation: 0, description: '', image: '',
   featured: false, price: 0, group_size: '2-10 people', rating: 4.5, highlights: [], best_season: [],
   hike_date: null, video: '', route_url: '', map_url: '', available_seats: null,
-  status: 'published',
+  status: 'published', display_order: 0,
 };
 
 function slugify(s: string) {
@@ -238,7 +239,9 @@ export function HikesManager() {
                 <option value="draft">Draft</option>
               </select>
             </Field>
+            <Field label="Display Order"><input type="number" className={inputClass} value={form.display_order ?? 0} onChange={e => setForm({ ...form, display_order: Number(e.target.value) })} placeholder="0" /></Field>
           </div>
+          <p className="text-xs text-gray-400 -mt-2">Lower numbers show first on the Hikes page. Hikes with the same order fall back to featured status.</p>
           <div className="grid md:grid-cols-3 gap-4">
             <Field label="Video URL"><input className={inputClass} value={form.video || ''} onChange={e => setForm({ ...form, video: e.target.value })} placeholder="https://..." /></Field>
             <Field label="Route URL"><input className={inputClass} value={form.route_url || ''} onChange={e => setForm({ ...form, route_url: e.target.value })} placeholder="GPX / route link" /></Field>
