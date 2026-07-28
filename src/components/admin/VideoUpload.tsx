@@ -140,7 +140,7 @@ export function VideoUpload({ value, onChange, label = 'Video' }: VideoUploadPro
               <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                 <Video className="w-8 h-8 mb-2" />
                 <span className="text-sm font-medium">Click to upload video</span>
-                <span className="text-xs mt-1">MP4, WebM, MOV up to 100MB</span>
+                <span className="text-xs mt-1">MP4, WebM, MOV — larger files take longer to upload</span>
               </div>
             )}
           </div>
