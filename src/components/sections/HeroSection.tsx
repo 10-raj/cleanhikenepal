@@ -54,7 +54,7 @@ export function HeroSection() {
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-green-900 to-gray-900" />
         <div
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 opacity-20"
           style={{
             backgroundImage: `url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0g2B7cVSurqfCRQEQmWYeprlkLwvWPdTLbiqQ27ybWw&s=10')`,
             backgroundSize: 'cover',

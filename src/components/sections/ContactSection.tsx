@@ -4,12 +4,12 @@ import { z } from 'zod';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail, MapPin, Phone, Send, Clock, CheckCircle, AlertCircle,
-  Heart, Handshake, Users, Mountain, Calendar, User, Timer, Navigation,
+  Heart, Handshake, Users, Mountain, Calendar, Timer, Navigation,
   Loader2,
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Button } from '../ui/Button';
+
 import { Input, Textarea } from '../ui/Input';
 import { ScrollReveal } from '../common/ContainerScroll';
 import { InteractiveMap } from '../common/InteractiveMap';
@@ -85,7 +85,6 @@ export function ContactSection() {
   const location = useLocation();
   const formRef = useRef<HTMLDivElement>(null);
   const upcomingHikeRef = useRef<HTMLDivElement>(null);
-  const joinPartnerRef = useRef<HTMLDivElement>(null);
 
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [selectedPurpose, setSelectedPurpose] = useState<string>('general');

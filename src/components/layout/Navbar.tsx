@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Sun, Moon, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Menu, X, Sun, Moon, Instagram, Youtube } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useSiteLogo } from '../../hooks/useSiteLogo';
 
