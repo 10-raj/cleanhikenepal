@@ -10,7 +10,7 @@ const difficulties = ['All', 'Easy', 'Moderate', 'Challenging', 'Hard'];
 export function HikesPage() {
   const [search, setSearch] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState('All');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortOrder, setSortOrder] = useState<'default' | 'asc' | 'desc'>('default');
   const { hikes } = useHikes();
 
   const filteredHikes = useMemo(() => {
@@ -30,12 +30,16 @@ export function HikesPage() {
       result = result.filter(hike => hike.difficulty === selectedDifficulty);
     }
 
-    // Sort by duration (assuming format like "14 days")
-    result.sort((a, b) => {
-      const aDays = parseInt(a.duration);
-      const bDays = parseInt(b.duration);
-      return sortOrder === 'asc' ? aDays - bDays : bDays - aDays;
-    });
+    // 'default' preserves the order already set by the admin panel's
+    // Display Order field (the database query is already sorted that
+    // way). Only re-sort by duration when the visitor explicitly toggles it.
+    if (sortOrder !== 'default') {
+      result.sort((a, b) => {
+        const aDays = parseInt(a.duration);
+        const bDays = parseInt(b.duration);
+        return sortOrder === 'asc' ? aDays - bDays : bDays - aDays;
+      });
+    }
 
     return result;
   }, [hikes, search, selectedDifficulty, sortOrder]);
@@ -115,11 +119,11 @@ export function HikesPage() {
 
             {/* Sort */}
             <button
-              onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+              onClick={() => setSortOrder(prev => prev === 'default' ? 'asc' : prev === 'asc' ? 'desc' : 'default')}
               className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-emerald-500/50 transition-all"
             >
               <SortAsc className={`w-5 h-5 transition-transform ${sortOrder === 'desc' ? 'rotate-180' : ''}`} />
-              Duration
+              {sortOrder === 'default' ? 'Sort by Duration' : 'Duration'}
             </button>
           </div>
         </ScrollReveal>
