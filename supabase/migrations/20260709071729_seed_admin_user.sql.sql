@@ -1,14 +1,22 @@
 /*
 # Seed default admin user
 
-Creates the initial administrator account so the admin panel can be accessed.
+Creates the initial administrator account so the admin panel can be
+accessed. This migration has already run against your live database
+(it's idempotent - re-running it is a no-op if the account exists).
 
-Default credentials (change immediately in production):
-  Email:    admin@cleanhike.com
-  Password: CleanHike@2026
+SECURITY NOTE: This file previously contained a hardcoded plaintext
+password, committed to a public GitHub repo. That password should be
+treated as permanently compromised - if the admin@cleanhike.com
+account is still in use, rotate its password immediately via
+Supabase Dashboard -> Authentication -> Users -> find the account ->
+reset password. Note that scrubbing this file does not remove the
+old password from git's commit history - only rotating the actual
+Supabase password neutralizes the exposure.
 
-To change credentials, update the two constants below and re-run, OR create
-a new user via Supabase Auth and set their user_profiles.role to 'admin'.
+The password below is a placeholder only. If you need to (re-)seed
+this account, replace REPLACE_WITH_STRONG_PASSWORD with a real,
+unique password before running - and never commit that value.
 */
 
 DO $$
@@ -29,7 +37,7 @@ BEGIN
       'authenticated',
       'authenticated',
       admin_email,
-      crypt('CleanHike@2026', gen_salt('bf', 10)),
+      crypt('REPLACE_WITH_STRONG_PASSWORD', gen_salt('bf', 10)),
       NOW(), NOW(), NOW(),
       '{"provider":"email","providers":["email"]}',
       '{"name":"Admin","role":"admin"}'
