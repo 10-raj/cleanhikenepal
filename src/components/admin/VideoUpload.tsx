@@ -10,6 +10,9 @@ interface VideoUploadProps {
   label?: string;
 }
 
+const ACCEPTED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
+const MAX_VIDEO_SIZE = 500 * 1024 * 1024; // 500MB
+
 export function VideoUpload({ value, onChange, label = 'Video' }: VideoUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,6 +21,16 @@ export function VideoUpload({ value, onChange, label = 'Video' }: VideoUploadPro
 
   async function handleFile(file: File) {
     setError(null);
+
+    if (!ACCEPTED_VIDEO_TYPES.includes(file.type)) {
+      setError('Only MP4, WebM, or MOV videos are allowed.');
+      return;
+    }
+    if (file.size > MAX_VIDEO_SIZE) {
+      setError('File too large. Maximum size is 500MB.');
+      return;
+    }
+
     setUploading(true);
     try {
       const ext = file.name.split('.').pop()?.toLowerCase() || 'mp4';
@@ -36,7 +49,7 @@ export function VideoUpload({ value, onChange, label = 'Video' }: VideoUploadPro
       onChange(urlData.publicUrl);
     } catch (e) {
       console.error(e);
-      setError(e instanceof Error ? e.message : 'Upload failed. Ensure the storage bucket exists and allows uploads.');
+      setError('Upload failed. Ensure the storage bucket exists and allows uploads.');
     } finally {
       setUploading(false);
     }

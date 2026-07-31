@@ -79,7 +79,10 @@ export function useToast() {
 /** Best-effort message extraction, consistent with how admin managers
  * already catch errors (Supabase errors, thrown Errors, or unknown). */
 export function toErrorMessage(e: unknown, fallback: string): string {
-  if (e instanceof Error) return e.message;
-  if (typeof e === 'object' && e && 'message' in e) return String((e as { message: unknown }).message);
+  // Intentionally does not surface e.message to the user - raw errors from
+  // Supabase/Postgres can include internal details (table names, constraint
+  // names, RLS policy internals). Always show the friendly fallback instead;
+  // full error detail is still available via console.error, which every
+  // call site already logs alongside this for debugging.
   return fallback;
 }

@@ -86,9 +86,20 @@ export function GalleryManager() {
     setBulkModalOpen(true);
   }
 
+  const BULK_ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  const BULK_MAX_SIZE = 10 * 1024 * 1024; // 10MB
+
   function addBulkFiles(fileList: FileList | null) {
     if (!fileList) return;
-    const newFiles = Array.from(fileList).map(file => ({ file, status: 'pending' as const }));
+    const newFiles = Array.from(fileList).map(file => {
+      if (!BULK_ACCEPTED_TYPES.includes(file.type)) {
+        return { file, status: 'error' as const, error: 'Only JPG, PNG, or WEBP images are allowed.' };
+      }
+      if (file.size > BULK_MAX_SIZE) {
+        return { file, status: 'error' as const, error: 'File too large (max 10MB).' };
+      }
+      return { file, status: 'pending' as const };
+    });
     setBulkFiles(prev => [...prev, ...newFiles]);
   }
 
@@ -103,6 +114,7 @@ export function GalleryManager() {
     let nextOrder = items.length > 0 ? Math.max(...items.map(i => i.display_order)) + 1 : 0;
 
     for (let i = 0; i < bulkFiles.length; i++) {
+      if (bulkFiles[i].status === 'error') continue;
       setBulkFiles(prev => prev.map((f, idx) => idx === i ? { ...f, status: 'uploading' } : f));
       try {
         const file = bulkFiles[i].file;
@@ -130,7 +142,8 @@ export function GalleryManager() {
         successCount++;
         setBulkFiles(prev => prev.map((f, idx) => idx === i ? { ...f, status: 'done' } : f));
       } catch (e) {
-        setBulkFiles(prev => prev.map((f, idx) => idx === i ? { ...f, status: 'error', error: e instanceof Error ? e.message : 'Upload failed' } : f));
+        console.error('Bulk gallery upload error:', e);
+        setBulkFiles(prev => prev.map((f, idx) => idx === i ? { ...f, status: 'error', error: 'Upload failed' } : f));
       }
     }
 

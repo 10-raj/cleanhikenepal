@@ -11,6 +11,9 @@ interface ImageUploadProps {
   aspect?: 'square' | 'wide';
 }
 
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+
 export function ImageUpload({ value, onChange, label = 'Image', folder = 'misc', aspect = 'wide' }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +22,16 @@ export function ImageUpload({ value, onChange, label = 'Image', folder = 'misc',
 
   async function handleFile(file: File) {
     setError(null);
+
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      setError('Only JPG, PNG, WEBP, GIF, or SVG images are allowed.');
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      setError('File too large. Maximum size is 10MB.');
+      return;
+    }
+
     setUploading(true);
     try {
       const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
@@ -37,7 +50,7 @@ export function ImageUpload({ value, onChange, label = 'Image', folder = 'misc',
       onChange(urlData.publicUrl);
     } catch (e) {
       console.error(e);
-      setError(e instanceof Error ? e.message : 'Upload failed');
+      setError('Upload failed. Ensure the storage bucket exists and allows uploads.');
     } finally {
       setUploading(false);
     }
